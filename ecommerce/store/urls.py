@@ -1,0 +1,22 @@
+from django.urls import path
+
+from . import views
+
+urlpatterns = [
+    path('', views.home, name = 'home'),
+    path('shop/', views.store, name = 'shop'),
+    path('shop/shop-details/<int:id>/', views.shop_details, name = 'shop-details'),
+    path('shop/cart/', views.cart, name = 'cart'),
+    path('blog/', views.blog, name = 'blog'),
+    path('contact/', views.contact, name = 'contact'),
+    path('about/', views.about, name = 'about'),
+    path('signout/', views.signout, name = 'signout'),
+    path('signin/', views.signin, name = 'signin'),
+    path('signup/', views.signup, name = 'signup'),
+    path('otplogin/', views.otplogin, name = 'otplogin'),
+    path('otp/', views.otp, name = 'otp'),
+    path('shop/checkout/', views.checkout, name = 'checkout'),
+    path('update_item/', views.updateItem, name = 'update_item'),
+    path('process_order/', views.processOrder, name = 'process_order'),
+    
+]

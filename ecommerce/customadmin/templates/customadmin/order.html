@@ -1,0 +1,80 @@
+{% extends 'customadmin/adminbase.html' %}
+
+{% load static %}
+
+{% block content%}
+
+<div class="container-fluid px-4">
+    <div class="row my-5">
+        <div>
+            <h3 class="fs-4 mb-3">Order Management</h3>
+            
+        </div>
+        <div>
+            <a class="btn btn-sm btn-outline-success float-end mb-3 " href="addorder">Add Order</a>
+        </div>
+        <div class="col">
+            <table id="ordertable" class="table bg-white rounded shadow-sm  table-hover" style="width: 100%;">
+                <thead>
+                    <tr>
+                        <th>Customer</th>
+                        <th>Order Id</th>
+                        <th>Date Ordered</th>
+                        <th>Complete</th>
+                        <th>transaction id</th>
+                        <th>Details</th>
+                        <th>Edit</th>
+                        <th>Delete</th>
+                        
+                    </tr>
+                </thead>
+    
+                
+                <tbody>
+                    {% for order in order %}
+                    <tr>
+                        <td>{{order.user.first_name}}</td>
+                        <td>{{order.id}}</td>
+                        <td>{{order.date_ordered}}</td>
+                        <td>{{order.complete}}</td>
+                        <td>{{order.transaction_id}}</td>
+                        <th><a href="" data-bs-toggle="modal" data-bs-target="#blockModal{{order.id}}"> <small>View details</small></a></th>
+                        <td><a class="btn btn-sm btn-primary" href="#">Edit</a></td>
+                        <td><a class="btn btn-sm btn-danger" href="#">Delete</a></td>
+                        
+                    </tr>
+                    {% endfor %}
+
+                    <!-- Modal Block User-->
+                    {% for orderitem in orderitem %}
+                        <div class="modal fade" id="blockModal{{orderitem.order.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                <p class="modal-title text-danger" id="exampleModalLabel">Order Details</p>
+                                </div>
+                                <div class="modal-body ">
+                                    <div>Item - {{orderitem.product.name}}</div>
+                                    <div>Order id -  {{orderitem.order.id}}</div>
+                                    <div>Quantity - {{orderitem.quantity}}</div>
+                               
+                                </div>
+                                <div class="modal-footer">
+                                <button type="button" class="btn btn-sm btn-secondary" aria-label="Close" data-bs-dismiss="modal">Close</button>
+                                
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+
+                    
+                </tbody>
+                
+            </table>
+        </div>
+ 
+    </div>
+</div>
+
+{% endblock content%}

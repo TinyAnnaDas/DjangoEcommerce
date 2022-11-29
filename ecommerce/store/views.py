@@ -1,0 +1,229 @@
+
+
+from django.shortcuts import render, redirect
+from django.contrib.auth.models import auth
+from django.contrib import messages
+from store.mixins import MessageHandler
+from django.http import JsonResponse
+import json
+import datetime
+
+from .models import *
+from .utils import *
+
+# Create your views here.
+
+
+
+
+def signup (request):
+    if request.method == 'POST':
+        fname = request.POST['first_name']
+        lname = request.POST['last_name']
+        email = request.POST['email']
+        phone1 = request.POST['phone']
+        phone = '+91'+ phone1
+        password1 = request.POST['password1']
+        password2 = request.POST['password2']
+
+
+        if password1==password2:
+            if User.objects.filter(username=email).exists():
+                messages.info(request,'User already exists')
+                return redirect(signup)
+            else:
+                user = User.objects.create_user(first_name = fname, last_name = lname, phone_number=phone, username=email,  password=password1)
+                user.save()
+                print('user created')
+                return redirect('signin')
+                
+        else:
+            messages.info(request,'Passwords do not match')
+            return redirect ('signup')
+
+    return render(request,'store/signup.html')
+
+
+def signin (request):
+    if 'username' in request.session:
+        return redirect(home)
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        user = auth.authenticate(username=username, password = password)
+        print(user)
+        
+        if user is not None:
+            auth.login(request, user)
+            print(request.user.is_anonymous)
+            request.session['username'] = username
+            return redirect(home)
+        else:
+            messages.error(request, 'Invalid Credintials!!!')
+            return redirect(signin)
+        
+    return render(request,'store/signin.html')
+
+
+def otplogin(request):
+    if request.method=='POST':
+        global phone
+        phone1=request.POST['phone_number']
+        phone = '+91'+ phone1
+        print(phone)
+        message_handler = MessageHandler(phone).sent_otp_on_phone()
+        return redirect('otp')
+    return render(request, 'store/otplogin.html')
+
+def otp(request):
+    if request.method=='POST':
+        otp1= request.POST['otp']
+        validate = MessageHandler(phone).validate(otp1)
+        print("validate=",validate)
+        if validate=="approved":
+            user = User.objects.get(phone_number=phone)
+
+            print(user.username)
+            if user==None:
+                messages.error(request, 'Wrong Credentials')
+                return redirect('otp')
+            auth.login(request,user)
+           
+            return redirect('home')
+    return render(request, 'store/otp.html')
+
+
+
+
+def home(request):
+    data = cartData(request)
+    cartItems = data['cartItems']
+    order = data['order']
+
+    products = Products.objects.all()
+    context = {'products':products, 'cartItems':cartItems,'order':order,}
+    return render(request, 'store/home.html', context)
+    
+def store(request):
+    data = cartData(request)
+    cartItems = data['cartItems']
+    order = data['order']
+
+    products = Products.objects.all()
+    context = {'products':products, 'cartItems':cartItems,'order':order,}
+    return render(request, 'store/store.html', context)
+
+def shop_details(request,id):
+    if request.user.is_authenticated:
+        customer = request.user
+        order, created = Order.objects.get_or_create(user=customer, complete=False)
+        items = order.orderitem_set.all()
+        cartItems = order.get_cart_items
+        cartTotal = order.get_cart_total
+    else:
+        items = []
+        order = {'get_cart_total':0, 'get_cart_items':0}
+        cartItems = order['get_cart_items']
+        cartTotal = order['get_cart_total']
+
+    product = Products.objects.get(id=id)
+    print(product.imageURL)
+    context = {'product':product,'cartItems':cartItems,'cartTotal':cartTotal}
+    return render (request, 'store/pages/shop-details.html', context)
+
+
+def blog(request):
+    return render(request, 'store/blog.html')
+
+def contact(request):
+    return render(request, 'store/contact.html')
+
+def about(request):
+    return render(request, 'store/pages/about.html')
+    
+def signout(request):
+    if request.user.is_authenticated:
+        auth.logout(request)
+        return redirect('home')
+
+
+
+
+def cart(request):
+    data = cartData(request)
+    cartItems = data['cartItems']
+    order = data['order']
+    items = data['items']
+
+    context = {'items':items, 'order':order, 'cartItems':cartItems,}
+    return render(request, 'store/pages/shopping-cart.html', context)
+    
+
+def checkout(request):
+
+    data = cartData(request)
+    cartItems = data['cartItems']
+    order = data['order']
+    items = data['items']
+
+    context = {'items':items, 'order':order, 'cartItems':cartItems,}
+    return render(request, 'store/pages/checkout.html', context)
+
+def updateItem(request):
+    data = json.loads(request.body)
+    productId = data['productId']
+    action =  data['action']
+
+    print('Action:',action)
+    print('productId:',productId)
+
+    customer = request.user
+    product = Products.objects.get(id=productId)
+    order, created = Order.objects.get_or_create(user=customer,complete = False)
+
+    orderItem, created = OrderItem.objects.get_or_create(order=order, product=product)
+
+    if action == 'add':
+        orderItem.quantity = (orderItem.quantity + 1)
+    elif action == 'remove':
+        orderItem.quantity = (orderItem.quantity - 1)
+    orderItem.save()
+
+    if orderItem.quantity <= 0:
+        orderItem.delete()
+
+    return JsonResponse('Item was added', safe=False )
+
+def processOrder(request):
+    transaction_id = datetime.datetime.now().timestamp()
+    data = json.loads(request.body)
+
+    if request.user.is_authenticated:
+        customer = request.user
+        order, created = Order.objects.get_or_create(user=customer,complete = False)
+
+    else:
+        customer,order = guestOrder(request, data)
+
+    total = float(data['form']['total'])
+    order.transaction_id = transaction_id
+   
+
+    if total == float(order.get_cart_total):
+        order.complete = True
+    order.save()
+
+    ShippingAddress.objects.create(
+            user = customer,
+            order = order,
+            address = data['shipping']['address'],
+            city = data ['shipping']['city'],
+            state = data['shipping']['state'],
+            zipcode = data ['shipping']['zipcode'],
+        )
+
+    return JsonResponse('Payment complete', safe=False )
+
+
+
+
