@@ -169,30 +169,42 @@ def checkout(request):
     context = {'items':items, 'order':order, 'cartItems':cartItems,}
     return render(request, 'store/pages/checkout.html', context)
 
+from django.views.decorators.csrf import csrf_exempt
+@csrf_exempt
 def updateItem(request):
-    data = json.loads(request.body)
-    productId = data['productId']
-    action =  data['action']
+    if request.method == 'POST':
+        productId = request.POST.get('productId')
+        action = request.POST.get('action')
+        print('Action:',action)
+        print('productId:',productId)
 
-    print('Action:',action)
-    print('productId:',productId)
+        customer = request.user
+        product = Products.objects.get(id=productId)
+        order, created = Order.objects.get_or_create(user=customer,complete = False)
 
-    customer = request.user
-    product = Products.objects.get(id=productId)
-    order, created = Order.objects.get_or_create(user=customer,complete = False)
+        orderItem, created = OrderItem.objects.get_or_create(order=order, product=product)
 
-    orderItem, created = OrderItem.objects.get_or_create(order=order, product=product)
+        if action == 'add':
+            orderItem.quantity = (orderItem.quantity + 1)
+        
+        elif action == 'remove':
+            if orderItem.quantity !=1:
+                orderItem.quantity = (orderItem.quantity - 1)
+                # if orderItem.quantity <= 0:
+                #     orderItem.delete()
+        orderItem.save()
 
-    if action == 'add':
-        orderItem.quantity = (orderItem.quantity + 1)
-    elif action == 'remove':
-        orderItem.quantity = (orderItem.quantity - 1)
-    orderItem.save()
+        if action == 'delete':
+            orderItem.delete()
+           
+        
+        print(orderItem.product.name)
+        
+        
 
-    if orderItem.quantity <= 0:
-        orderItem.delete()
+        response = {'cartItems':order.get_cart_items, 'cartTotal':order.get_cart_total, 'itemTotal': orderItem.get_total, 'itemQty': orderItem.quantity,}
 
-    return JsonResponse('Item was added', safe=False )
+        return JsonResponse(response, safe=False )
 
 def processOrder(request):
     transaction_id = datetime.datetime.now().timestamp()

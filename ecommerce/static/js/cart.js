@@ -40,6 +40,8 @@ function addCookieItem(productId, action){
         }
     }
 
+    
+
     console.log('Cart:',cart)
     document.cookie ='cart=' + JSON.stringify(cart) + ";domain=;path=/"
     location.reload()
@@ -50,23 +52,67 @@ function addCookieItem(productId, action){
 function updateUserOrder(productId, action){
     console.log('User is logged in, sending data...')
 
-    var url = '/update_item/'
+ 
+       
+        $.ajax({
+            type: "POST",
+            url: "/update_item/",
+            data: {
+                'productId':productId,
+                'action':action,
+                'CSRFToken': csrftoken
+            },
+            success: function (response) {
+               
+                console.log(response.itemTotal)
+                console.log(response.itemQty)
 
-    fetch(url,{
-        method: 'POST',
-        headers: {
-            'Content-Type':'application/json',
-            'X-CSRFToken': csrftoken,
-        },
-        body: JSON.stringify({'productId': productId, 'action': action})
-    })
+                let cartqty = document.getElementsByClassName('cartqty')
+                for (var i=0; i < cartqty.length; i++){
 
-    .then((response) =>{
-        return response.json();
-    })
+                    cartqty[i].innerHTML = response.cartItems
+                    // cartqty.innerHTML = response.cartItems
+                }
 
-    .then((data) =>{
-        console.log('data:', data) 
-        location.reload()
-    });
+
+                let cartotal = document.getElementsByClassName('cartotal')
+                for (var i=0; i < cartotal.length; i++){
+
+                    cartotal[i].innerHTML = '&#8377; ' + response.cartTotal
+                    // cartqty.innerHTML = response.cartItems
+                }
+
+                console.log(productId)
+                console.log(action)
+            
+                // document.querySelectorAll('.productId')[1].value = response.itemQty
+                // document.querySelectorAll('.productId')[1].value = response.itemTotal
+
+                try{
+
+                    document.getElementById(productId+'total').innerHTML = '&#8377; ' + response.itemTotal
+                    
+                }catch(e){
+                    
+                    }
+                
+
+                try{
+
+                    document.getElementById(productId+'qty').value = response.itemQty
+
+                }catch(e){
+                    
+                    }
+
+               if (action == 'delete'){
+                document.getElementById(productId+'row').innerHTML = ''
+               }
+               
+            }
+        });
+        
+   
+    
+    
 }

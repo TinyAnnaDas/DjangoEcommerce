@@ -40,7 +40,9 @@
                             </thead>
                             <tbody>
                                 {% for item in items %}
-                                <tr>
+                               
+                                <tr id = {{item.product.id}}row>
+                                   
                                     <td class="product__cart__item">
                                         <div class="product__cart__item__pic">
                                             <img src="{{item.product.imageURL}}" alt="">
@@ -53,15 +55,16 @@
                                     <td class="quantity__item">
                                         <div class="quantity">
                                             <div class="pro-qty-2" >
-                                                <span class="fa fa-angle-left dec qtybtn update-cart" data-product = {{item.product.id}} data-action="remove"></span>
-                                                <input type="text" value="{{item.quantity}}">
-                                                <span class="fa fa-angle-right inc qtybtn update-cart" data-product = {{item.product.id}} data-action="add"></span>
+                                                <span class="fa fa-angle-left qtybutton update-cart" id="dec-button" data-product = {{item.product.id}} data-action="remove"></span>
+                                                <input type="text" id="{{item.product.id}}qty" value="{{item.quantity}}">
+                                                <span class="fa fa-angle-right inc qtybutton update-cart" data-product = {{item.product.id}} data-action="add"></span>
                                             </div>
                                         </div>
                                     </td>
-                                    <td class="cart__price">&#8377; {{item.get_total}}</td>
-                                    <td class="cart__close"><i data-action="delete" class="fa fa-close"></i></td>
+                                    <td class="cart__price " id="{{item.product.id}}total" >&#8377; {{item.get_total}}</td>
+                                    <td class="cart__close "><i data-product = {{item.product.id}} data-action="delete" class="fa fa-close update-cart"></i></td>
                                 </tr>
+                              
                                 {% endfor %}
                             </tbody>
                         </table>
@@ -72,11 +75,7 @@
                                 <a href="#">Continue Shopping</a>
                             </div>
                         </div>
-                        <div class="col-lg-6 col-md-6 col-sm-6">
-                            <div class="continue__btn update__btn ">
-                                <a href="#"><i class="fa fa-spinner "></i> Update cart</a>
-                            </div>
-                        </div>
+                      
                     </div>
                 </div>
                 <div class="col-lg-4">
@@ -90,8 +89,8 @@
                     <div class="cart__total">
                         <h6>Cart total</h6>
                         <ul>
-                            <li>Items <span>{{order.get_cart_items}}</span></li>
-                            <li>Total <span>&#8377; {{order.get_cart_total}}</span></li>
+                            <li>Items <span class="cartqty">{{order.get_cart_items}}</span></li>
+                            <li>Total <span class="cartotal">&#8377; {{order.get_cart_total}}</span></li>
                         </ul>
                         <a href="{% url 'checkout' %}" class="primary-btn">Proceed to checkout</a>
                     </div>
