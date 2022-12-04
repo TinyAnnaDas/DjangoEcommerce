@@ -51,21 +51,24 @@ function addCookieItem(productId, action){
 
 function updateUserOrder(productId, action){
     console.log('User is logged in, sending data...')
-
- 
        
+        var csrftoken =  $('input[name=csrfmiddlewaretoken]').val();
+        console.log(csrftoken)
+
         $.ajax({
             type: "POST",
             url: "/update_item/",
             data: {
                 'productId':productId,
                 'action':action,
-                'CSRFToken': csrftoken
+                csrfmiddlewaretoken : csrftoken
             },
             success: function (response) {
                
                 console.log(response.itemTotal)
                 console.log(response.itemQty)
+                alertify.success(response.messages);
+                
 
                 let cartqty = document.getElementsByClassName('cartqty')
                 for (var i=0; i < cartqty.length; i++){
@@ -74,6 +77,7 @@ function updateUserOrder(productId, action){
                     // cartqty.innerHTML = response.cartItems
                 }
 
+                
 
                 let cartotal = document.getElementsByClassName('cartotal')
                 for (var i=0; i < cartotal.length; i++){
@@ -85,8 +89,9 @@ function updateUserOrder(productId, action){
                 console.log(productId)
                 console.log(action)
             
-                // document.querySelectorAll('.productId')[1].value = response.itemQty
-                // document.querySelectorAll('.productId')[1].value = response.itemTotal
+                
+
+                //try and catch because of the problem, when adding items in the store page. 
 
                 try{
 

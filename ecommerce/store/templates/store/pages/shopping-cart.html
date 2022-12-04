@@ -55,6 +55,7 @@
                                     <td class="quantity__item">
                                         <div class="quantity">
                                             <div class="pro-qty-2" >
+                                                {% csrf_token %}
                                                 <span class="fa fa-angle-left qtybutton update-cart" id="dec-button" data-product = {{item.product.id}} data-action="remove"></span>
                                                 <input type="text" id="{{item.product.id}}qty" value="{{item.quantity}}">
                                                 <span class="fa fa-angle-right inc qtybutton update-cart" data-product = {{item.product.id}} data-action="add"></span>

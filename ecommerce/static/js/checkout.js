@@ -1,3 +1,7 @@
+
+/*--------------------------
+    Rarzorpay Integration
+---------------------------*/
 $(document).ready(function(){
 
     $('.payWithRazorpay').click(function(e){
@@ -47,3 +51,10 @@ $(document).ready(function(){
     })
 
 });
+
+
+/*--------------------------
+    Add Address
+---------------------------*/
+
+
