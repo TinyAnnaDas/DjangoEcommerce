@@ -247,6 +247,38 @@ def offer(request):
     return render(request, 'customadmin/offer.html', context)
 
 def coupons(request):
-    context = {}
+    coupons = Coupons.objects.all()
+    context = {'coupons':coupons}
     return render(request, 'customadmin/coupons.html', context)
+
+def addcoupon(request):
+    if request.method == 'POST':
+        couponcode = request.POST['couponcode']
+        percent = request.POST['percent']
+        Coupons.objects.create( couponcode=couponcode, percent=percent)
+    
+    context = {}
+    return render(request,  'customadmin/add_coupon.html', context)
+
+def editcoupon(request, cid):
+    if request.method == 'POST':
+        couponcode = request.POST['couponcode']
+        percent = request.POST['percent']
+
+        coupon = Coupons.objects.get(id=cid)
+        coupon.couponcode = couponcode
+        coupon.percent = percent
+        coupon.save()
+        return redirect(coupons)
+    
+    coupon = Coupons.objects.get(id=cid)
+    context = {'coupon':coupon}
+    return render(request,  'customadmin/edit_coupon.html', context)
+
+def deletecoupon(request, cid):
+
+    coupon = Coupons.objects.filter(id=cid)
+    coupon.delete()
+    return redirect(coupons)
+
     

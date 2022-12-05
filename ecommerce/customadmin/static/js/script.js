@@ -39,6 +39,12 @@ $(document).ready(function () {
   });
 });
 
+$(document).ready(function () {
+  $('#coupontable').DataTable({
+      scrollY: 200,
+      scrollX: true,
+  });
+});
 
 // Admin panel toggle
 

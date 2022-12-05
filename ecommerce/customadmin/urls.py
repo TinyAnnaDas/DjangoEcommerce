@@ -18,7 +18,11 @@ urlpatterns = [
     path('products/editproduct/<int:id>/',views.editproduct, name = 'editproduct'),
     path('products/deleteproduct/<int:id>/',views.deleteproduct, name = 'deleteproduct'),
 
-    path('coupons/', views.coupons, name = 'coupons'),
+    path('coupons/', views.coupons, name = 'admincoupons'),
+    path('coupons/addcoupon/', views.addcoupon, name = 'addcoupon'),
+    path('coupons/editcoupon/<int:cid>/', views.editcoupon, name = 'editcoupon'),
+    path('coupons/deletecoupon/<int:cid>/', views.deletecoupon, name = 'deletecoupon'),
+
 
     path('category/', views.category, name = 'category'),
     path('category/addcategory', views.addcategory, name = 'addcategory'),

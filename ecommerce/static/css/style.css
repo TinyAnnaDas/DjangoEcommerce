@@ -3867,9 +3867,13 @@ ol {
 	pointer-events: none;
 	display: none;
   }
-  img{
+  /* img{
 	width: 100%;
 	height:100%;
+  } */
+.order_images{
+	height: "40px";
+	width: "40px";
   }
   
 

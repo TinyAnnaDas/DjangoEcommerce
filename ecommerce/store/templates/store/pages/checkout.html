@@ -1,5 +1,9 @@
 
+{% extends 'store/main.html' %}
 
+{% load static %}
+
+{% block content %}
 
     <!-- Breadcrumb Section Begin -->
     
@@ -105,12 +109,14 @@
                     
                     </div>
 
-                    <div class="col-lg-4 col-md-6" 
-                    style="
-                    position: fixed;
-                    left: 53rem;
-                    top: 10rem;
-                    z-index: -1; ">
+                    <div class="col-lg-4 col-md-6" >
+                        <div class="cart__discount mt-4">
+                            <h6>Discount codes</h6>
+                            <form action="">
+                                <input  type="text" name="couponcode" placeholder="Coupon code">
+                                <button type="submit" value="Apply">Apply</button>
+                            </form>
+                        </div>
                         <div class="checkout__order">
                             <h4 class="order__title">Your order</h4>
                             <div class="checkout__order__products">Product <span>Total</span></div>
@@ -154,6 +160,7 @@
                             <!-- <button type="button" class="site-btn">COD | Place Order</button>
                             <button type="button" class="site-btn"><small>Pay with Razorpay</small> </button> -->
                         </div>
+                        
                     </div>
                 </div>
             </div>

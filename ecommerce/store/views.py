@@ -109,7 +109,15 @@ def profile(request):
     return render(request, 'store/pages/profile.html')
 
 def myOrders(request):
-    return render(request, 'store/pages/my_orders.html')
+    data = cartData(request)
+    cartItems = data['cartItems']
+    order = data['order']
+
+    customer = request.user
+    orders = customer.order_set.all()
+    
+    context = {'orders': orders, 'cartItems':cartItems,'order':order,}
+    return render(request, 'store/pages/my_orders.html', context)
 
 def wishlist(request):
     return render(request, 'store/pages/wishlist.html')
