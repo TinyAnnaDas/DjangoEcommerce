@@ -1,3 +1,78 @@
+/*--------------------------
+    Add Address
+---------------------------*/
+
+
+var total = '{{order.get_cart_total}}'
+
+function newAddress() {
+    document.getElementById("shipping-info").classList.remove('d-none')
+    var radioButton = document.getElementsByClassName("radio-button");
+        radioButton.checked = false;
+    }
+    
+function cancelNewAddress() {
+    document.getElementById("shipping-info").classList.add('d-none')
+    }
+
+
+var shippingform = document.getElementById('shippingform') 
+
+newcsrftoken = shippingform.getElementsByTagName("input")[0].value
+console.log('Newtoken :', form.getElementsByTagName("input")[0].value)
+
+
+
+
+shippingform.addEventListener('submit', function(e){
+    e.preventDefault()
+    console.log("Form Submitted... ")
+    addAddress()
+    document.getElementById('form-button').classList.add('d-none')
+    document.getElementById('payment-info').classList.remove('d-none')
+})
+
+    function addAddress(){
+
+        var shippingform = document.getElementById('form') 
+    
+        var shippingInfo = {
+            
+            'address': null,
+            'city':null,
+            'state':null,
+            'zipcode':null,
+            'shippingaddressId':null,
+    
+        }
+    
+        shippingInfo.address = shippingform.address.value
+        shippingInfo.city = shippingform.city.value
+        shippingInfo.state = shippingform.state.value
+        shippingInfo.zipcode = shippingform.zipcode.value
+        shippingInfo.shippingaddressId = shippingform.shippingaddressId.value
+
+        console.log(shippingInfo.address)
+    
+        $.ajax({
+            type: "POST",
+            url: "/add_address/",
+            data: {
+                'address':shippingInfo.address,
+                'city':shippingInfo.city,
+                'state':shippingInfo.state,
+                'zipcode':shippingInfo.zipcode,
+                'CSRFToken': csrftoken
+            },
+            success: function (response) {
+                console.log(response)
+            }
+        });
+    
+    }
+	
+
+
 
 /*--------------------------
     Rarzorpay Integration
@@ -53,8 +128,6 @@ $(document).ready(function(){
 });
 
 
-/*--------------------------
-    Add Address
----------------------------*/
+
 
 

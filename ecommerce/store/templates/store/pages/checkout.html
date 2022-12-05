@@ -25,7 +25,7 @@
                            
 
                                 <hr>
-                            <form id="form">
+                            <form id="shippingform">
                                 {% csrf_token %}  
 
                                 {% for shippingaddress in shippingaddress %}
@@ -112,7 +112,16 @@
                     <div class="col-lg-4 col-md-6" >
                         <div class="cart__discount mt-4">
                             <h6>Discount codes</h6>
-                            <form action="">
+                            {% if coupon_code_message %}
+                            <div class="alert alert-light alert-dismissible fade show mt-3" role="alert">
+                                <strong class="text-danger">{{coupon_code_message}}</strong>
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            {%endif%}
+                            <form action="" id="coupon-form">
+                                {% csrf_token %}
                                 <input  type="text" name="couponcode" placeholder="Coupon code">
                                 <button type="submit" value="Apply">Apply</button>
                             </form>
@@ -133,32 +142,6 @@
                                 <li>Total <span>&#8377; {{order.get_cart_total}}</span></li>
                             </ul>
                             
-
-                            <!-- <div class="checkout__input__checkbox">
-                                <label for="acc-or">
-                                    Create an account?
-                                    <input type="checkbox" id="acc-or">
-                                    <span class="checkmark"></span>
-                                </label>
-                            </div>
-                            <p>Lorem ipsum dolor sit amet, consectetur adip elit, sed do eiusmod tempor incididunt
-                            ut labore et dolore magna aliqua.</p>
-                            <div class="checkout__input__checkbox">
-                                <label for="payment">
-                                    Check Payment
-                                    <input type="checkbox" id="payment">
-                                    <span class="checkmark"></span>
-                                </label>
-                            </div>
-                            <div class="checkout__input__checkbox">
-                                <label for="paypal">
-                                    Paypal
-                                    <input type="checkbox" id="paypal">
-                                    <span class="checkmark"></span>
-                                </label>
-                            </div> -->
-                            <!-- <button type="button" class="site-btn">COD | Place Order</button>
-                            <button type="button" class="site-btn"><small>Pay with Razorpay</small> </button> -->
                         </div>
                         
                     </div>

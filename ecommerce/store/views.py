@@ -189,9 +189,11 @@ def checkout(request):
     cartItems = data['cartItems']
     order = data['order']
     items = data['items']
+    coupon = data['coupon']
+    coupon_code_message = data['coupon_code_message']
     shippingaddress = data['shippingaddress']
     
-    context = {'items':items, 'order':order, 'cartItems':cartItems, 'shippingaddress':shippingaddress}
+    context = {'items':items, 'order':order, 'cartItems':cartItems, 'shippingaddress':shippingaddress, 'coupon':coupon, 'coupon_code_message':coupon_code_message }
     return render(request, 'store/pages/checkout.html', context)
 
 from django.views.decorators.csrf import csrf_exempt
