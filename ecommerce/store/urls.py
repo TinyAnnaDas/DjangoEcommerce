@@ -19,6 +19,7 @@ urlpatterns = [
     path('update_item/', views.updateItem, name = 'update_item'),
     path('add_address/', views.addshippingAddress, name = 'add_address'),
     path('process_order/', views.processOrder, name = 'process_order'),
+    path('add_coupon/', views.addCoupon, name='add_coupon'),
     path('account/', views.profile, name = 'account'),
     path('orders/', views.myOrders, name = 'orders'),
     path('wishlist/', views.wishlist, name = 'wishlist'),

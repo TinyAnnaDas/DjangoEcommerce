@@ -19,28 +19,45 @@
                         
                         <h6 class="coupon__code"><span class="icon_tag_alt"></span> Have a coupon? <a href="#">Click
                         here</a> to enter your code</h6>
-                          
                         <h6 class="checkout__title">Billing Details</h6>
-                        <div class="box-element " id="form-wrapper">
+                        <div class="box-element " id="form-wrapper"> 
                            
 
                                 <hr>
                             <form id="shippingform">
+
                                 {% csrf_token %}  
+                              
+                                <div id="addresses">
+                                    {% for shippingaddress in shippingaddress %}
+                                        <input type="radio" class="radio-button" id="shippingaddressid" name="shippingaddressId" value="{{shippingaddress.id}}" checked>
+                                        <br>
+                                        <label for="html" id="addresses-label">
+                                            <div class="card-body">
+                                                <div class="card-title">
+                                                    <b>  {{shippingaddress.name}}</b>
+                                                </div>
+                                                <div class="card-subtitle">
+                                                    {{shippingaddress.phone}}
+                                                </div>
+                                                <div class="card-text">
+                                                    {{shippingaddress.address}}, {{shippingaddress.city}}, {{shippingaddress.state}}, {{shippingaddress.zipcode}}
+                                                </div>
+                                            </div>
+                                        
+                                            
+                                        </label>
+                                        <br>
+                                    {% endfor %}
+                                </div>
+                                    
 
-                                {% for shippingaddress in shippingaddress %}
-                                <label for="html">
-                                    <input type="radio" class="radio-button" name="shippingaddressId" value="{{shippingaddress.id}}" checked>
-                                  
-                                        <b>{{shippingaddress.user.first_name}} {{shippingaddress.user.last_name}}, {{shippingaddress.user.phone_number}}</b>, <br>{{shippingaddress.address}}, {{shippingaddress.city}}, {{shippingaddress.state}}, {{shippingaddress.zipcode}}
-         
-                                </label>
+                                
 
-                                {% endfor %}
 
                                 
                                 <br>
-                                <input href="payment-options" id="form-button" class="btn btn-success " type="submit" value="Deliver here">
+                                <input id="deliver-button" class="btn btn-success" onclick="deliverHere()" value="Deliver here">
 
                                 <hr>
                                 <div>
@@ -52,6 +69,20 @@
                                 <div id="shipping-info" class="d-none">
                                    
                                     <div class="checkout__input row">
+                                
+                                        <div class="col-lg-6">
+                                            <div class="checkout__input">
+                                                <p>First Name<span>*</span></p>
+                                                <input type="text" placeholder="Name" name="name">
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6">
+                                            <div class="checkout__input">
+                                                <p>Phone Number<span>*</span></p>
+                                                <input type="text" placeholder="10-digit mobile number" name="phone">
+                                            </div>
+                                        </div>
+                               
                                         <div class="col-lg-12">
                                             <p requried>Address<span>*</span></p>
                                         </div>
@@ -85,7 +116,7 @@
                                             <input type="text" name = "zipcode" required>
                                         </div>
                                     </div>
-                                    <input id="addadress-button" class="btn btn-success " type="submit" value="SAVE AND DELIVER HERE">
+                                    <input id="address-button" class="btn btn-success " type="submit" value="SAVE AND DELIVER HERE">
                                     <button id="cancel-button" type="button" onclick="cancelNewAddress()">Cancel</button>
                                 </div>
                                 
@@ -112,34 +143,41 @@
                     <div class="col-lg-4 col-md-6" >
                         <div class="cart__discount mt-4">
                             <h6>Discount codes</h6>
-                            {% if coupon_code_message %}
-                            <div class="alert alert-light alert-dismissible fade show mt-3" role="alert">
-                                <strong class="text-danger">{{coupon_code_message}}</strong>
-                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            {%endif%}
+
+                                <div class="alert alert-danger" role="alert" id="coupon-error-msg" hidden>
+                                    
+                                </div>
+
+                                <div class="alert alert-success" role="alert" hidden id="coupon-success-msg">
+                                   
+                                  </div>
+                                <!-- <div class="alert alert-light alert-dismissible fade show mt-3" hidden role="alert" id="error-alert">
+                                    <strong class="text-danger" id="coupon-error-msg"></strong>
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div> -->
+                          
                             <form action="" id="coupon-form">
-                                {% csrf_token %}
+                                <input id="carttotal" type="text" hidden value="{{order.get_cart_total}}">
+                                <input id="orderid" type="text" hidden value="{{order.id}}">
                                 <input  type="text" name="couponcode" placeholder="Coupon code">
                                 <button type="submit" value="Apply">Apply</button>
                             </form>
                         </div>
                         <div class="checkout__order">
-                            <h4 class="order__title">Your order</h4>
-                            <div class="checkout__order__products">Product <span>Total</span></div>
-                            {% for item in items %}
+
+                            <h4 class="order__title">Order Summary</h4>
+                            <div class="checkout__order__products">Items ({{order.get_cart_items}}) <span id="test-total">&#8377; {{order.get_cart_total}}</span></div>
+                            <div class="checkout__order__products" hidden id="discounted_amount">Discount applied <span></span></div>
+                           
                             <ul class="checkout__total__products">
-                                <li>{{item.product.name}} <small><i>x</i> {{item.quantity}}</small>   <span>&#8377; {{item.get_total}}</span></li>
+                                <li>Delivery    <span style="color:#009a7b;"><strong>Free</strong></span></li>
                                 
                             </ul>
-                            {% endfor %}
-
-                        
+                           
                             <ul class="checkout__total__all">
-                                <li>Items <span>{{order.get_cart_items}}</span></li>
-                                <li>Total <span>&#8377; {{order.get_cart_total}}</span></li>
+                                <li>Payable amount  <span id="coupon-cart-total">&#8377; {{order.get_cart_total}}</span></li>
                             </ul>
                             
                         </div>
@@ -158,123 +196,8 @@
 
     <script>
 
-        document.getElementById('make-payment').addEventListener('click', function(e){
-			submitFormData()
-		})
-   
-        var total = '{{order.get_cart_total}}'
-        // Render the PayPal button into #paypal-button-container
-        paypal_sdk.Buttons({
-
-            // Set up the transaction
-            createOrder: function(data, actions) {
-                return actions.order.create({
-                    purchase_units: [{
-                        amount: {
-                            value: parseFloat(total/84).toFixed(2)
-                        }
-                    }]
-                });
-            },
-
-            // Finalize the transaction
-            onApprove: function(data, actions) {
-                return actions.order.capture().then(function(orderData) {
-                    // Successful capture! For demo purposes:
-                    console.log('Capture result', orderData, JSON.stringify(orderData, null, 2));
-                    var transaction = orderData.purchase_units[0].payments.captures[0];
-                    alert('Transaction '+ transaction.status + ': ' + transaction.id + '\n\nSee console for all available details');
-
-                    submitFormData()
-
-                    // Replace the above to show a success message within this page, e.g.
-                    // const element = document.getElementById('paypal-button-container');
-                    // element.innerHTML = '';
-                    // element.innerHTML = '<h3>Thank you for your payment!</h3>';
-                    // Or go to another URL:  actions.redirect('thank_you.html');
-                });
-            }
-
-
-        }).render('#paypal-button-container');
-
-
-     
-       
 
     </script>
-
-
-    <script type="text/javascript">
-
-		var total = '{{order.get_cart_total}}'
-
-		var shippingform = document.getElementById('form') 
-
-        newcsrftoken = shippingform.getElementsByTagName("input")[0].value
-        console.log('Newtoken :', form.getElementsByTagName("input")[0].value)
-
-
-        function newAddress() {
-            document.getElementById("shipping-info").classList.remove('d-none')
-            var radioButton = document.getElementsByClassName("radio-button");
-                radioButton.checked = false;
-          }
-          
-          function cancelNewAddress() {
-            document.getElementById("shipping-info").classList.add('d-none')
-          }
-
-		shippingform.addEventListener('submit', function(e){
-			e.preventDefault()
-			console.log("Form Submitted... ")
-            addAddress()
-			document.getElementById('form-button').classList.add('d-none')
-			document.getElementById('payment-info').classList.remove('d-none')
-		})
-
-        function addAddress(){
-
-            var shippingform = document.getElementById('form') 
-        
-            var shippingInfo = {
-                
-                'address': null,
-                'city':null,
-                'state':null,
-                'zipcode':null,
-                'shippingaddressId':null,
-        
-            }
-        
-            shippingInfo.address = shippingform.address.value
-            shippingInfo.city = shippingform.city.value
-            shippingInfo.state = shippingform.state.value
-            shippingInfo.zipcode = shippingform.zipcode.value
-            shippingInfo.shippingaddressId = shippingform.shippingaddressId.value
-
-            console.log(shippingInfo.address)
-        
-            $.ajax({
-                type: "POST",
-                url: "/add_address/",
-                data: {
-                    'address':shippingInfo.address,
-                    'city':shippingInfo.city,
-                    'state':shippingInfo.state,
-                    'zipcode':shippingInfo.zipcode,
-                    'CSRFToken': csrftoken
-                },
-                success: function (response) {
-                    console.log(response)
-                }
-            });
-        
-        }
-	
-
-		
-	</script>
 
 
 {% endblock content %}

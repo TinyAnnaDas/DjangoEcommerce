@@ -50,20 +50,6 @@ def cartData(request):
         order, created = Order.objects.get_or_create(user=customer, complete=False)
         items = order.orderitem_set.all()
         cartItems = order.get_cart_items
-        
-        coupon = None
-        coupon_code_message = None 
-        couponcode = request.GET.get('couponcode')
-
-        if couponcode: 
-            print(couponcode)
-            try:
-                coupon = Coupons.objects.get(couponcode=couponcode)
-            except:
-                coupon_code_message = 'Invalid Coupon Code!'
-                print('Invalid coupon')
-            
-        
         shippingaddress = customer.shippingaddress_set.all()
     else:
         cookieData = cookieCart(request)
@@ -72,7 +58,7 @@ def cartData(request):
         items = cookieData['items']
         shippingaddress = ''
 
-    return {'cartItems':cartItems, 'order':order, 'items':items, 'shippingaddress':shippingaddress, 'coupon':coupon, 'coupon_code_message':coupon_code_message}
+    return {'cartItems':cartItems, 'order':order, 'items':items, 'shippingaddress':shippingaddress,}
 
 def guestOrder(request, data):
     print('User is not logged in..')

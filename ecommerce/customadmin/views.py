@@ -113,10 +113,9 @@ def addproduct(request):
         category = request.POST['category']
         description = request.POST['description']
         image = request.FILES['image']
-        
-        # category = Category.objects.get(id=category)
+     
         Products.objects.create(name=product_name, price=price,description=description,category_id=category, image=image)
-        # product.save()
+   
         print('product added')
         return redirect(products)
 
@@ -190,9 +189,8 @@ def deleteproduct(request, id):
 
 
 def order(request):
-    order = Order.objects.all()
-    orderitem = OrderItem.objects.all()
-    context = {'orderitem':orderitem, 'order':order}
+    orders = Order.objects.all()
+    context = {'orders':orders}
     return render(request, 'customadmin/order.html', context)
 
 def addorder(request):

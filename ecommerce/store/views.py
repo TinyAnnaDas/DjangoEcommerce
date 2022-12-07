@@ -7,13 +7,12 @@ from store.mixins import MessageHandler
 from django.http import JsonResponse
 import json
 import datetime
-
+from django.core import serializers
+from django.http import HttpResponse
 from .models import *
 from .utils import *
 
 # Create your views here.
-
-
 
 
 def signup (request):
@@ -170,9 +169,6 @@ def signout(request):
         return redirect('home')
         
 
-
-
-
 def cart(request):
     data = cartData(request)
     cartItems = data['cartItems']
@@ -189,11 +185,11 @@ def checkout(request):
     cartItems = data['cartItems']
     order = data['order']
     items = data['items']
-    coupon = data['coupon']
-    coupon_code_message = data['coupon_code_message']
+    # coupon = data['coupon']
+    # coupon_code_message = data['coupon_code_message']
     shippingaddress = data['shippingaddress']
     
-    context = {'items':items, 'order':order, 'cartItems':cartItems, 'shippingaddress':shippingaddress, 'coupon':coupon, 'coupon_code_message':coupon_code_message }
+    context = {'items':items, 'order':order, 'cartItems':cartItems, 'shippingaddress':shippingaddress, }
     return render(request, 'store/pages/checkout.html', context)
 
 from django.views.decorators.csrf import csrf_exempt
@@ -236,20 +232,60 @@ def updateItem(request):
 
         return JsonResponse(response, safe=False )
 
-@csrf_exempt
 def addshippingAddress(request):
     if request.method == 'POST':
         customer = request.user
         ShippingAddress.objects.create(
             user = customer,
+            name = request.POST.get('name'),
+            phone = request.POST.get('phone'),
             address = request.POST.get('address'),
             city = request.POST.get('city'),
             state = request.POST.get('state'),
             zipcode = request.POST.get('zipcode'),
         )
+        
         shippingaddress = ShippingAddress.objects.last()
-        #convert to JSON string
-        response = json.dumps(shippingaddress.__dict__)
+        # shippingaddress = ShippingAddress.objects.filter(user=customer)
+
+        response = serializers.serialize("json", [shippingaddress]),
+        print(response)
+       
+        # response = {'shippingaddress':shippingaddress}
+
+    return HttpResponse(response, content_type="application/json")
+    # return JsonResponse(response, safe=False )
+
+def addCoupon(request):
+    if request.method == 'POST':
+        customer = request.user
+        orderid = request.POST.get('orderid')
+        order = customer.order_set.get(id=orderid)
+
+        cart_total = request.POST.get('total')
+        cart_total = int(float(cart_total))
+        print(cart_total)
+        print(type(cart_total))
+        coupon = request.POST.get('couponcode')
+
+        try:
+            coupon = Coupons.objects.get(couponcode=coupon)
+            coupon_discount = coupon.percent
+            print(type(coupon_discount))
+            print(coupon_discount)
+        
+            discounted_price = int(cart_total - (cart_total * .01 * coupon_discount))
+            discounted_amount = int(cart_total * .01 * coupon_discount)
+        
+                
+
+            response = {'discounted_price':discounted_price, 'coupon_discount':coupon_discount, 'discounted_amount':discounted_amount}
+
+        except:
+            coupon_code_message = 'Invalid Coupon Code!'
+            print('Invalid coupon')
+            response = {'error_message':coupon_code_message,}
+        
 
     return JsonResponse(response, safe=False )
 
@@ -258,6 +294,7 @@ def addshippingAddress(request):
 def processOrder(request):
     transaction_id = datetime.datetime.now().timestamp()
     data = json.loads(request.body)
+    print(data)
 
     if request.user.is_authenticated:
         customer = request.user
@@ -266,31 +303,21 @@ def processOrder(request):
     else:
         customer,order = guestOrder(request, data)
 
-    total = float(data['form']['total'])
+    total = float(data['orderdata']['total'])
     order.transaction_id = transaction_id
    
 
     if total == float(order.get_cart_total):
         order.complete = True
 
-    # try:
 
-    shippingaddressId = int(data ['shipping']['shippingaddressId'])
+    shippingaddressId = int(data ['orderdata']['shippingaddressId'])
+    print(shippingaddressId)
     order.shippingaddress = ShippingAddress.objects.get(id=shippingaddressId)
     
-    # except:
-    #     ShippingAddress.objects.create(
-    #     user = customer,
-    #     address = shppingaddress.address,
-    #     city = shppingaddress.city,
-    #     state = shppingaddress.state,
-    #     zipcode = shppingaddress.state,
-    # )
-
-
-
-
     order.save()
+
+    print(order)
 
     
    

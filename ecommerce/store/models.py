@@ -79,6 +79,8 @@ class Products(models.Model):
 
 class ShippingAddress(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    name = models.CharField(max_length=50, null=True)
+    phone = models.CharField(max_length = 13, null=True, blank=True,)
     address = models.CharField(max_length=200, null=True)
     city = models.CharField(max_length=200, null=True)
     state = models.CharField(max_length=200, null=True)
@@ -96,6 +98,7 @@ class Order(models.Model):
     date_ordered = models.DateTimeField(auto_now_add=True, null=True)
     complete = models.BooleanField(default=False)
     transaction_id = models.CharField(max_length=100, null=True)
+    
 
     def __str__(self):
         return str(self.id)
@@ -112,7 +115,7 @@ class Order(models.Model):
         orderitems = self.orderitem_set.all()
         total = sum([item.quantity for item in orderitems])
         return total
-   
+
 
 
 class OrderItem(models.Model):

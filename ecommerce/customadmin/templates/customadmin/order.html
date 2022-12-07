@@ -31,7 +31,7 @@
     
                 
                 <tbody>
-                    {% for order in order %}
+                    {% for order in orders %}
                     <tr>
                         <td>{{order.user.first_name}}</td>
                         <td>{{order.id}}</td>
@@ -39,34 +39,56 @@
                         <td>{{order.complete}}</td>
                         <td>{{order.transaction_id}}</td>
                         <th><a href="" data-bs-toggle="modal" data-bs-target="#blockModal{{order.id}}"> <small>View details</small></a></th>
+
+
                         <td><a class="btn btn-sm btn-primary" href="#">Edit</a></td>
                         <td><a class="btn btn-sm btn-danger" href="#">Delete</a></td>
                         
                     </tr>
-                    {% endfor %}
-
+                   
+                  
+              
                     <!-- Modal Block User-->
-                    {% for orderitem in orderitem %}
-                        <div class="modal fade" id="blockModal{{orderitem.order.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered" role="document">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                <p class="modal-title text-danger" id="exampleModalLabel">Order Details</p>
+                  
+ 
+                            <div class="modal fade" id="blockModal{{order.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                    <p class="modal-title text-danger fw-bold fs-4" id="exampleModalLabel">Order Details</p>
+                                    </div>
+                                    <div class="modal-body ">
+                                        {% for orderitem in order.orderitem_set.all %}
+                                            <div class="row">
+                                                <div class="col-md-6 fw-bold">
+                                                    Item <br>
+                                                    Order id<br>
+                                                    Quantity
+                                                </div>
+                                                <div class="col-md-6">  
+                                                    {{orderitem.product.name}} <br>
+                                                    {{orderitem.order.id}} <br>
+                                                    {{orderitem.quantity}}
+                                                </div>
+                                            </div>
+                                            <br>
+                                        {% endfor %} 
+                                     
+                                       
+                                    </div>
+                                    <div class="modal-footer">
+                                    <button type="button" class="btn btn-sm btn-secondary" aria-label="Close" data-bs-dismiss="modal">Close</button>
+                                    
+                                    </div>
                                 </div>
-                                <div class="modal-body ">
-                                    <div>Item - {{orderitem.product.name}}</div>
-                                    <div>Order id -  {{orderitem.order.id}}</div>
-                                    <div>Quantity - {{orderitem.quantity}}</div>
-                               
-                                </div>
-                                <div class="modal-footer">
-                                <button type="button" class="btn btn-sm btn-secondary" aria-label="Close" data-bs-dismiss="modal">Close</button>
-                                
                                 </div>
                             </div>
-                            </div>
-                        </div>
-                    {% endfor %}
+                        {% endfor %}
+
+                 
+                        
+                        
+                
 
                     
                 </tbody>
