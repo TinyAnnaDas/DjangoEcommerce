@@ -1,5 +1,7 @@
+
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.core.validators import MinValueValidator, MaxValueValidator
 # Create your models here.
 
 
@@ -14,16 +16,31 @@ class Customer(models.Model):
     name = models.CharField(max_length = 200, null=True)
     email = models.CharField(max_length=200, null=True)
 
+class Offer(models.Model):
+    discount = models.IntegerField(default=0, null=True, blank=True)
+    valid_from = models.DateTimeField()
+    valid_to = models.DateTimeField()
+    is_active = models.BooleanField(default=False)
+
+    @property 
+    def p_offer_price(self):
+        p_offer_price = self.products_set.price - (self.products_set.price * self.discount * 0.01)
+        return p_offer_price
+
+    @property
+    def c_offer_price(self):
+        c_offer_price = self.category_set.price - (self.category_set.price * self.discount * 0.01)
+        return c_offer_price
 
 
 class Category(models.Model):
     category_name=models.CharField(max_length=50)
     image= models.ImageField(upload_to="images",default="")
+    offer = models.ForeignKey(Offer, on_delete=models.SET_NULL, null=True, blank=True)
 
 
     def __str__(self):
         return self.category_name
-
 
 
 
@@ -40,9 +57,13 @@ class Products(models.Model):
     image3= models.ImageField( null=True, blank=True)
     trending = models.BooleanField(default=False, help_text="0=default, 1=Trending")
     date_created = models.DateTimeField(auto_now_add=True, null=True)
+    offer = models.ForeignKey(Offer, on_delete=models.SET_NULL, null=True, blank=True)
+
 
     def __str__(self):
         return str(self.name)
+
+    
     
     @property
     def imageURL(self):
@@ -132,5 +153,11 @@ class OrderItem(models.Model):
 class Coupons(models.Model):
     couponcode = models.CharField(max_length=200, null=True)
     percent = models.IntegerField(default = 0, null=True, blank=True)
+    valid_from = models.DateTimeField(auto_now_add=True)
+    valid_to = models.DateTimeField(auto_now_add=True)
+    active = models.BooleanField(default=False)
+
+
+
 
 

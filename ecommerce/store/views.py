@@ -104,6 +104,19 @@ def home(request):
     context = {'products':products, 'cartItems':cartItems,'order':order,}
     return render(request, 'store/home.html', context)
 
+
+def categoryView (request, categoryname):
+
+    if (Category.objects.filter(category_name=categoryname)):
+        products = Products.objects.filter(category__category_name=categoryname)
+        product_qty = Products.objects.filter(category__category_name=categoryname).count()
+        print(product_qty)
+
+    category = Category.objects.all()
+    context= {'products':products, 'categoryname':categoryname, 'category':category, 'product_qty':product_qty}
+    return render(request, 'store/pages/category_view.html', context)
+
+
 def profile(request):
     return render(request, 'store/pages/profile.html')
 
@@ -131,7 +144,8 @@ def store(request):
     order = data['order']
 
     products = Products.objects.all()
-    context = {'products':products, 'cartItems':cartItems,'order':order,}
+    category = Category.objects.all()
+    context = {'products':products, 'cartItems':cartItems,'order':order, 'category':category}
     return render(request, 'store/store.html', context)
 
 def shop_details(request,id):
@@ -192,8 +206,7 @@ def checkout(request):
     context = {'items':items, 'order':order, 'cartItems':cartItems, 'shippingaddress':shippingaddress, }
     return render(request, 'store/pages/checkout.html', context)
 
-from django.views.decorators.csrf import csrf_exempt
-# @csrf_exempt
+
 def updateItem(request):
     if request.method == 'POST':
         productId = request.POST.get('productId')

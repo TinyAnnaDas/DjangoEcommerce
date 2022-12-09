@@ -68,8 +68,22 @@
             link.parentElement.classList.add('active');
         }
     })
+    
+    const currentlocation = location.href
+    const sidelinks = document.getElementsByClassName('sidebar_category_links')
+    for(var i=0; i < sidelinks.length; i++){
+        if(sidelinks[i].href === currentlocation){
+            sidelinks[i].className = "shop__sidebar__brand_active"
+        }
+    }
 
 
+    // const sideLinks = document.querySelectorAll('li a').
+    // forEach(link => {
+    //     if (link.href === (`${activePage}`)){ 
+    //         link.parentElement.classList.add('shop__sidebar__brand_active');
+    //     }
+    // })
     // $(document).on('click', 'nav li ', function(){
     //     $(this).addClass('active').siblings().removeClass('active') 
     // })
@@ -173,47 +187,7 @@
         type: 'iframe'
     });
 
-    /*-------------------
-		Quantity change
-	--------------------- */
-    // var proQty = $('.pro-qty');
-    // proQty.prepend('<span class="fa fa-angle-up dec qtybtn update-cart" data-product = {{item.product.id}} data-action="remove"></span>');
-    // proQty.append('<span class="fa fa-angle-down inc qtybtn update-cart" data-product = {{item.product.id}} data-action="add"></span>');
-    // proQty.on('click', '.qtybtn', function () {
-    //     var $button = $(this);
-    //     var oldValue = $button.parent().find('input').val();
-    //     if ($button.hasClass('inc')) {
-    //         var newVal = parseFloat(oldValue) + 1;
-    //     } else {
-    //         // Don't allow decrementing below zero
-    //         if (oldValue > 0) {
-    //             var newVal = parseFloat(oldValue) - 1;
-    //         } else {
-    //             newVal = 0;
-    //         }
-    //     }
-    //     $button.parent().find('input').val(newVal);
-    // });
-
-    // var proQty = $('.pro-qty-2');
-    // proQty.prepend('<span class="fa fa-angle-left dec qtybtn"></span>');
-    // proQty.append('<span class="fa fa-angle-right inc qtybtn"></span>');
-    // proQty.on('click', '.qtybtn', function () {
-    //     var $button = $(this);
-    //     var oldValue = $button.parent().find('input').val();
-    //     if ($button.hasClass('inc')) {
-    //         var newVal = parseFloat(oldValue) + 1;
-    //     } else {
-    //         // Don't allow decrementing below zero
-    //         if (oldValue > 0) {
-    //             var newVal = parseFloat(oldValue) - 1;
-    //         } else {
-    //             newVal = 0;
-    //         }
-    //     }
-    //     $button.parent().find('input').val(newVal);
-    // });
-
+  
     /*------------------
         Achieve Counter
     --------------------*/
@@ -243,6 +217,8 @@ $(document).ready(function(){
     zoomrange:[3,3]
     });
 })
+
+
 
 
 
