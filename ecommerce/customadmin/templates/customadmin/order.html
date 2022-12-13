@@ -21,6 +21,7 @@
                         <th>Order Id</th>
                         <th>Date Ordered</th>
                         <th>Complete</th>
+                        <th>Status</th>
                         <th>transaction id</th>
                         <th>Details</th>
                         <th>Edit</th>
@@ -37,12 +38,13 @@
                         <td>{{order.id}}</td>
                         <td>{{order.date_ordered}}</td>
                         <td>{{order.complete}}</td>
+                        <th>{{order.status}}</th>
                         <td>{{order.transaction_id}}</td>
                         <th><a href="" data-bs-toggle="modal" data-bs-target="#blockModal{{order.id}}"> <small>View details</small></a></th>
 
 
-                        <td><a class="btn btn-sm btn-primary" href="#">Edit</a></td>
-                        <td><a class="btn btn-sm btn-danger" href="#">Delete</a></td>
+                        <td><a class="btn btn-sm btn-primary" href="updateorder/{{order.id}}">Update</a></td>
+                        <td><a class="btn btn-sm btn-danger" href="deleteorder/{{order.id}}">Delete</a></td>
                         
                     </tr>
                    

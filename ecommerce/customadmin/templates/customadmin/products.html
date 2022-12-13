@@ -23,7 +23,7 @@
                         <th>Image1</th>
                         <th>Image2</th>
                         <th>Image3</th>
-                        <th>Description</th>
+                        <th>Offer</th>
                         <th>Edit</th>
                         <th>Delete</th>
                         
@@ -41,7 +41,13 @@
                         <td><img class="thumbnail-admin" src="{{product.image1URL}}" alt=""></td>
                         <td><img class="thumbnail-admin" src="{{product.image2URL}}" alt=""></td>
                         <td><img class="thumbnail-admin" src="{{product.image3URL}}" alt=""></td>
-                        <td>{{product.description}}</td>
+
+                        {% if product.offer %}
+                            <td class="text-success fw-bold">{{product.offer.discount}} %</td>
+                        {% else %}
+                            <td class="text-secondary fw-bold">No Offer</td>
+                        {% endif %}
+
                         <td><a class="btn btn-sm btn-primary" href="editproduct/{{product.id}}">Edit</a></td>
                         <td><a class="btn btn-sm btn-danger" href="deleteproduct/{{product.id}}">Delete</a></td>
                         

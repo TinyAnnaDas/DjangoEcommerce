@@ -8,7 +8,7 @@
 
     <div class="container">
         <div class="row">
-            <div class="col-md-12">
+            <div class="col-md-12 mx-auto">
                 <div class="card shadow">
                     <div class="card-body">
                         <h4>Your Orders</h4>
@@ -24,7 +24,7 @@
                                 <div class="col-md-2 my-auto">
                                     <img class="order_images" src="{{ item.product.imageURL}}" alt="Image here" height="70px" width="70px">
                                 </div>
-                                <div class="col-md-3 my-auto">
+                                <div class="col-md-2 my-auto">
                                     <h6>{{item.product.name}}</h6>
                                     <small>Quantity: {{item.quantity}}</small>
                                 </div>
@@ -36,7 +36,10 @@
                                     <a href="">Order status</a>
                                 </div>
                                 <div class="col-md-2 my-auto">
-                                    <button class="btn btn-danger"><i class="fa fa trash"></i> &times; Cancel Order</button>
+                                    <button class="btn btn-danger"><i class="fa fa-times"></i> Cancel Order</button>
+                                </div>
+                                <div class="col-md-2 my-auto">
+                                    <a href="/view_invoice/{{order.id}}">View Invoice</a>
                                 </div>
                             </div>
 

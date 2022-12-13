@@ -8,15 +8,9 @@ for(var i =0; i < updateBtns.length; i++ ){
         console.log('productId:',productId,'action:',action)
 
         console.log('USER:', user)
-
-        if(user == 'AnonymousUser'){
-
-            addCookieItem(productId, action)
-
-        }else{
             
-            updateUserOrder(productId, action)
-        }
+        updateUserOrder(productId, action)
+        
     })
 }
 
@@ -121,3 +115,42 @@ function updateUserOrder(productId, action){
     
     
 }
+
+
+
+
+var updateWishlist = document.getElementsByClassName('addToWishlist')
+
+for(var i =0; i < updateWishlist.length; i++ ){
+
+    updateWishlist[i].addEventListener('click', function(){
+        var productId = this.dataset.product
+        
+        console.log('productId:',productId)
+        console.log('USER:', user)
+
+        addToWishlist(productId)
+
+    })
+}
+
+function addToWishlist(productId){
+    console.log('User is logged in, sending wishlist...')
+     
+    var csrftoken =  $('input[name=csrfmiddlewaretoken]').val();
+    console.log(csrftoken)
+    
+    $.ajax({
+        method: "POST",
+        url: "/add_to_wishlist/",
+        data: {
+            'productId':productId,
+            csrfmiddlewaretoken : csrftoken
+        },
+        
+        success: function (response) {
+            alertify.success(response.status);
+        }
+    });
+}
+

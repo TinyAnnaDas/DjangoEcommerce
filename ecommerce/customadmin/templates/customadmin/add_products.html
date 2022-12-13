@@ -42,6 +42,7 @@
                     
                     <label for="cars">Choose a Category:</label>
                         <select name="category" id="category" >
+                           
                             {% for category in category %}
                                 <option value="{{category.id}}">{{category.category_name}}</option>
                             {% endfor %}

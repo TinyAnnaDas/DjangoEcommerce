@@ -33,8 +33,7 @@
     <script>
         var user = '{{request.user}}'
 
-
-        function getToken(name) {
+        function getCookie(name) {
             let cookieValue = null;
             if (document.cookie && document.cookie !== '') {
                 const cookies = document.cookie.split(';');
@@ -49,43 +48,20 @@
             }
             return cookieValue;
         }
-        const csrftoken = getToken('csrftoken');
 
-// The below function will look for  a cookie named cart in our browser and returns it //
 
-        function getCookie(name) {
-		    // Split cookie string and get all individual name=value pairs in an array
-		    var cookieArr = document.cookie.split(";");
+        function uuidv4() {
+            return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+              (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+            );
+          }
 
-		    // Loop through the array elements
-		    for(var i = 0; i < cookieArr.length; i++) {
-		        var cookiePair = cookieArr[i].split("=");
+        let device = getCookie('devuce')
 
-		        /* Removing whitespace at the beginning of the cookie name
-		        and compare it with the given string */
-		        if(name == cookiePair[0].trim()) {
-		            // Decode the cookie value and return
-		            return decodeURIComponent(cookiePair[1]);
-		        }
-		    }
-
-		    // Return null if not found
-		    return null;
-		}
-
-    //setting the variable cart to return the value of 'cart' from the cookie parser.
-		var cart = JSON.parse(getCookie('cart'))
-
-    //if the cart is undefined we are creating one. 
-     
-        if(cart == undefined){
-            cart = {}
-            console.log('Cart was created!')
-            document.cookie ='cart=' + JSON.stringify(cart) + ";domain=;path=/"  
-            //cart= is the name + value +  assigning the cookie to the main domain of the website.
+        if (device == null || device == undefined){
+            device = uuidv4()
         }
-
-        console.log('Cart:',cart)
+        document.cookie = 'device=' + device + ";domain=;path=/"
 
     </script>
 </head>
@@ -201,7 +177,7 @@
                 <div class="col-lg-3 col-md-3">
                     <div class="header__nav__option">
                         <a href="#" class="search-switch"><img src="{% static 'images/icon/search.png' %}" alt=""></a>
-                        <a href="#"><img src="{% static 'images/icon/heart.png' %}" alt=""></a>
+                        <a href="{% url 'wishlist' %}"><img src="{% static 'images/icon/heart.png' %}" alt=""></a>
                         
                         <a href="{% url 'cart' %}"><img src="{% static 'images/icon/cart.png' %}" alt=""> <span class="cartqty">{{cartItems}}</span></a>
                         <div class="price cartotal">&#8377; {{order.get_cart_total}}</div>

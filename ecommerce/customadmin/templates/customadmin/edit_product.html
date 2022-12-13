@@ -87,23 +87,25 @@
                 </div>
                 <hr>
                 
-                <!-- <script type="text/javascript">
-                    document.getElementById('id_image').value = '{{product.image}}';
-                </script> -->
-                
-                <!-- <div class="form-group">
-                    <label for=""><strong>Image1</strong></label>
-                    <br>
-                    <small>"currently: "
-                        <a href="{{product.image1URL}}">{{product.image1}}</a>
-                        <br>
-                        "change: "
-                        <input value="{{product.image1}}" name="image1" type="file"  placeholder="Image1">
-                    </small> 
+                <div class="form-group">
                     
-                </div>
-                <hr> -->
+                    <label for="offer">Choose an offer Percetage:</label>
+                        <select name="offerid" id="offer" >
+                            <option value="" selected>No Offer</option>
+                        {% for offer in offer %}
+                           
+                            {% if  offer.discount == product.offer.discount %}
+                                <option value="{{product.offer_id}}" selected>{{product.offer.discount}}</option>
+                            {%else %}
+                               
+                                <option value="{{offer.id}}">{{offer.discount}}</option>
 
+                            {% endif %}
+                        {% endfor %}
+                        </select>
+                        
+                </div>
+                <hr>
           
                 <div class="form-group">
                     

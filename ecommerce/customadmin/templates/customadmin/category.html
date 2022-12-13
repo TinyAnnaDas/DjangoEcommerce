@@ -20,6 +20,7 @@
           <tr>
             <th>Name</th>
             <th>Image</th>
+            <th>Offer</th>
             <th></th>
             <th></th>
           </tr>
@@ -33,6 +34,11 @@
           
           <td>{{category.category_name}}</td>
           <td></td>
+          {% if category.offer %}
+            <td class="text-success fw-bold">{{category.offer.discount}} %</td>
+          {% else %}
+            <td class="text-secondary fw-bold">No Offer</td>
+          {% endif %}
           <td><a class="btn btn-sm btn-primary" href="editcategory/{{category.id}}">Edit</a></td>
           <td><a class="btn btn-sm btn-danger" href="deletecategory/{{category.id}}">Delete</a></td>
           

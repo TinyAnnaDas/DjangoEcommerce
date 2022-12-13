@@ -11,7 +11,10 @@ urlpatterns = [
     path('customer/unblockcustomer/<int:id>/', views.unblockcustomer, name = 'unblockcustomer'),
 
    
-    path('offer/', views.offer, name = 'offer'),
+    path('offer/', views.offer, name = 'adminoffer'),
+    path('offer/addoffer/', views.addOffer, name = 'addoffer'),
+    path('offer/editoffer/<int:oid>/', views.editOffer, name = 'editoffer'),
+    path('offer/deleteoffer/<int:oid>/', views.deleteOffer, name = 'deleteoffer'),
 
     path('products/', views.products, name = 'products'),
     path('products/addproduct/',views.addproduct, name = 'addproduct'),
@@ -27,11 +30,12 @@ urlpatterns = [
     path('category/', views.category, name = 'category'),
     path('category/addcategory', views.addcategory, name = 'addcategory'),
     path('category/editcategory/<int:id>/',views.editcategory, name = 'editcategory'),
-    path('category/editcategory/<int:id>/',views.deletecategory, name = 'deletecategory'),
+    path('category/deletecategory/<int:id>/',views.deletecategory, name = 'deletecategory'),
 
-     path('order/', views.order, name = 'order'),
-     path('order/addorder', views.addorder, name = 'addorder'),
-     path('order/addorderitem', views.addorderitem, name = 'addorderitem'),
-     path('order/deleteorder/<int:id>/',views.deleteorder, name = 'deleteorder'),
+    path('order/', views.order, name = 'adminorder'),
+    path('order/addorder', views.addorder, name = 'addorder'),
+    path('order/addorderitem', views.addorderitem, name = 'addorderitem'),
+    path('order/deleteorder/<int:id>/',views.deleteorder, name = 'deleteorder'),
+    path('order/updateorder/<int:id>/',views.editorder, name = 'updateorder'),
     
 ]

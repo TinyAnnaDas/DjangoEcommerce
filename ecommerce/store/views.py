@@ -9,8 +9,11 @@ import json
 import datetime
 from django.core import serializers
 from django.http import HttpResponse
+from django.contrib.auth.decorators import login_required
 from .models import *
 from .utils import *
+from xhtml2pdf import pisa
+from django.template.loader import get_template
 
 # Create your views here.
 
@@ -112,24 +115,14 @@ def categoryView (request, categoryname):
         product_qty = Products.objects.filter(category__category_name=categoryname).count()
         print(product_qty)
 
-    category = Category.objects.all()
-    context= {'products':products, 'categoryname':categoryname, 'category':category, 'product_qty':product_qty}
+    categories = Category.objects.all()
+    context= {'products':products, 'categories':categories, 'product_qty':product_qty}
     return render(request, 'store/pages/category_view.html', context)
 
 
 def profile(request):
     return render(request, 'store/pages/profile.html')
 
-def myOrders(request):
-    data = cartData(request)
-    cartItems = data['cartItems']
-    order = data['order']
-
-    customer = request.user
-    orders = customer.order_set.all()
-    
-    context = {'orders': orders, 'cartItems':cartItems,'order':order,}
-    return render(request, 'store/pages/my_orders.html', context)
 
 def wishlist(request):
     return render(request, 'store/pages/wishlist.html')
@@ -142,10 +135,21 @@ def store(request):
     data = cartData(request)
     cartItems = data['cartItems']
     order = data['order']
-
+    offer = Offer.objects.all()
     products = Products.objects.all()
-    category = Category.objects.all()
-    context = {'products':products, 'cartItems':cartItems,'order':order, 'category':category}
+
+    categories = Category.objects.all()
+    
+    for category in categories:
+        if category.offer:
+            print(category.products_set.all())
+            for product in category.products_set.all():
+                # product.price = category.offer.pOfferPrice
+                print(product.price)
+            # i.products_set.price = i.offer.offerPrice
+   
+    
+    context = {'products':products, 'cartItems':cartItems,'order':order, 'categories':categories,}
     return render(request, 'store/store.html', context)
 
 def shop_details(request,id):
@@ -192,7 +196,7 @@ def cart(request):
     context = {'items':items, 'order':order, 'cartItems':cartItems,}
     return render(request, 'store/pages/shopping-cart.html', context)
     
-
+@login_required(login_url='signin')
 def checkout(request):
 
     data = cartData(request)
@@ -213,8 +217,11 @@ def updateItem(request):
         action = request.POST.get('action')
         print('Action:',action)
         print('productId:',productId)
-
-        customer = request.user
+        try:
+            customer = request.user.id
+        except:
+            device = request.COOKIES['device']
+            customer, created = User.objects.get_or_create(device=device)
         product = Products.objects.get(id=productId)
         order, created = Order.objects.get_or_create(user=customer,complete = False)
 
@@ -358,5 +365,84 @@ def processOrder(request):
     return JsonResponse('Payment complete', safe=False )
 
 
+@login_required(login_url='signin')
+def wishlist(request):
+    wishlist = Wishlist.objects.filter(user=request.user)
+    wishlistcount = Wishlist.objects.all().count()
+    context = {'wishlist':wishlist, 'wishlistcount':wishlistcount}
+    return render (request, 'store/pages/wishlist.html', context)
+
+def addToWishlist(request):
+    if request.method == 'POST':
+        if request.user.is_authenticated:
+            product_id = int(request.POST.get('productId'))
+            product_check = Products.objects.get(id=product_id)
+            if(product_check):
+                if(Wishlist.objects.filter(user=request.user, product_id=product_id)):
+                    return JsonResponse({'status': "Product already in wishlist"})
+                else:
+                    Wishlist.objects.create(user = request.user, product_id=product_id)
+                    return JsonResponse({'status': "Product added to wishlist"})
+            else:
+                return JsonResponse({'status': "No such product found"})
+        else:
+            return JsonResponse({'status': "Login to continue"})
+    return redirect('/')
+
+def deleteFromWishlist(request):
+    if request.method == 'POST':
+        product_id = int(request.POST.get('productId'))
+        delete_wishlist = Wishlist.objects.filter(user=request.user, product_id=product_id)
+        delete_wishlist.delete()
+        return JsonResponse({'status': "item  removed from wishlist"})
 
 
+def myOrders(request):
+    data = cartData(request)
+    cartItems = data['cartItems']
+    order = data['order']
+
+    customer = request.user
+    orders = customer.order_set.all()
+   
+    
+    context = {'orders': orders, 'cartItems':cartItems,'order':order,}
+    return render(request, 'store/pages/my_orders.html', context)
+
+        
+def view_invoice(request, order_id):
+    
+    current_order=Order.objects.get(id=order_id)
+    print(current_order)
+    
+    orderitems = OrderItem.objects.filter(order_id = current_order.id)
+    print(orderitems)
+    # order_item=[]
+    # for order in current_order:
+
+        # for orderitem in order:
+        #     print(order.orderitem_set.last().product.name)
+
+    user = request.user
+    print(user)
+    template_path = 'store/pages/invoice.html'
+   
+    print(template_path)
+
+    context = {'current_order': current_order, 'orderitems':orderitems, 'user': user}
+
+    response = HttpResponse(content_type='application/pdf')
+
+    response['Content-Disposition'] = 'filename="invoice.pdf"'
+
+    template = get_template(template_path)
+
+    html = template.render(context)
+
+    # create a pdf
+    pisa_status = pisa.CreatePDF(
+    html, dest=response)
+    # if error then show some funy view
+    if pisa_status.err:
+        return HttpResponse('We had some errors <pre>' + html + '</pre>')
+    return response

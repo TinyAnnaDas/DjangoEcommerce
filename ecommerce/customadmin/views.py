@@ -38,7 +38,10 @@ def adminlogin(request):
 @never_cache
 def dashboard(request):
     if 'useradmin' in request.session:
-        context = {}
+        orders = Order.objects.all()
+        products = Products.objects.all()
+   
+        context = {'orders':orders, 'products':products}
         return render(request, 'customadmin/dashboard.html', context)
     return redirect (adminlogin)
 
@@ -80,21 +83,35 @@ def addcategory(request):
         category = Category.objects.create(category_name=category_name)
         category.save()
         print('category added')
-        return redirect (addcategory)
+        return redirect ('category')
     else:
-        return render (request, 'customadmin/add_category.html')
+        offer = Offer.objects.all()
+        context = {'offer':offer}
+        return render (request, 'customadmin/add_category.html', context)
 
 def deletecategory(request,id):
-    pass
+    category = Category.objects.filter(id=id)
+    category.delete()
+    return redirect('category')
 
 def editcategory(request,id):
     if request.method == 'POST':
-        pass
-    else:
+        category_name = request.POST['category']
+        offerid = request.POST['offerid']
         currentcategory = Category.objects.get(id=id)
-        category = Category.objects.all()
-        context = {'currentcategory':currentcategory, 'category':category}
-        return render(request, 'customadmin/edit_category.html', context)
+        currentcategory.category_name = category_name
+        currentcategory.offer_id = offerid
+        for product in currentcategory.products_set.all():
+            product.offer_id = offerid
+            product.save()
+        currentcategory.save()
+        return redirect ('category')
+
+    category = Category.objects.all()
+    offer = Offer.objects.all()
+    currentcategory = Category.objects.get(id=id)
+    context = { 'category':category, 'offer':offer, 'currentcategory':currentcategory}
+    return render(request, 'customadmin/edit_category.html', context)
 
 
 def products(request):
@@ -104,8 +121,9 @@ def products(request):
 
 def addproduct(request):
     if request.method=='GET':
+        offer = Offer.objects.all()
         category=Category.objects.all()
-        return render(request,'customadmin/add_products.html',{'category':category})
+        return render(request,'customadmin/add_products.html',{'category':category, 'offer':offer})
 
     if request.method == 'POST':
         product_name = request.POST['product_name']
@@ -125,52 +143,20 @@ def editproduct(request,id):
         price = request.POST['price']
         description = request.POST['description']
         category = request.POST['category']
+        offer = request.POST['offerid']
 
-
-        # try:
-        #     image = request.FILES['image']
-        # except:
-        #     image = ''
-        # try:
-        #     image1 = request.FILES['image1']
-        # except:
-        #     image1 = ''
-        # try:
-        #     image2 = request.FILES['image2']
-        # except:
-        #     image2 = ''
-        # try:
-        #     image3 = request.FILES['image3']
-        # except:
-        #     image3 = ''
-
-        # categorylist = Category.objects.get(id=category)
-        # print(categorylist)
         product = Products.objects.get(id=id)
         product.name = product_name
         product.price = price
         product.description = description
         product.category_id=category
+        product.offer_id=offer
         product.image = request.FILES.get('image',product.image)
-        # if image == '':
-        #     image = product.image
-        # else:
-        #     product.image = image
-
-        # if image1 == '':
-        #     image1 = product.image1
-        # else:
-        #     product.image1 = image1
-
-        # if image2 == '':
-        #     image2 = product.image2
-        # else:
-        #     product.image2 = image2
-
-        # if image3 == '':
-        #     image3 = product.image3
-        # else:
-        #     product.image3 = image3
+        product.image1 = request.FILES.get('image1',product.image1)
+        product.image2 = request.FILES.get('image2',product.image2)
+        product.image3 = request.FILES.get('image3',product.image3)
+        product.offer_id = offer
+        
         
         product.save()
         
@@ -179,7 +165,8 @@ def editproduct(request,id):
         product=Products.objects.get(id=id)
         print(type(product.image1))
         category = Category.objects.all()
-        return render(request, 'customadmin/edit_product.html',{'product': product, 'category':category})
+        offer = Offer.objects.all()
+        return render(request, 'customadmin/edit_product.html',{'product': product, 'category':category, 'offer':offer})
 
 def deleteproduct(request, id):
     product = Products.objects.filter(id=id)
@@ -231,9 +218,34 @@ def addorderitem(request):
         print('Orderitem added')
         return redirect('order')
 
+def editorder(request,id):
+    if request.method == 'POST':
+        user_id = request.POST['first_name']
+        shipping_id = request.POST['shippingaddress']
+        complete = request.POST['complete']
+        print(complete)
+        transaction_id = request.POST['transaction_id']
+        status = request.POST['status']
+        order = Order.objects.get(id=id) 
+        order.user_id = user_id
+        order.shippingaddress_id = shipping_id
+        order.complete = complete
+        order.transaction_id = transaction_id
+        order.status = status
+        order.save()
+        return redirect ('adminorder')
+        
+    order = Order.objects.get(id=id) 
+    user = User.objects.all()
+    shippingaddress = ShippingAddress.objects.all()
+    print(order.status)
+    for i in order.STATUS:
+        print(i[1])
+    context = {'order':order, 'user':user, 'shippingaddress':shippingaddress}
+    return render(request, 'customadmin/edit_order.html', context)
 
 def deleteorder(request, id):
-    order = Order.objects.filter(id=id)
+    order = Order.objects.get(id=id)
     order.delete()
     return redirect('order')
 
@@ -241,8 +253,37 @@ def deleteorder(request, id):
 
 
 def offer(request):
-    context = {}
+    offers = Offer.objects.all()
+
+    context = {'offers':offers}
     return render(request, 'customadmin/offer.html', context)
+
+def addOffer(request):
+    if request.method == 'POST':
+        discount = request.POST['discount']
+        valid_from = request.POST['valid_from']
+        valid_to = request.POST['valid_to']
+        is_active = request.POST["is_active"]
+        
+        Offer.objects.create(discount=discount, valid_from=valid_from, valid_to=valid_to, is_active=is_active )
+        return redirect(offer)
+
+    
+    context = {}
+    return render(request, 'customadmin/add_offer.html', context)
+
+def editOffer(request, oid):
+    offer = Offer.objects.get(id=oid)
+    context = {'offer':offer}
+    return render(request, 'customadmin/edit_offer.html', context)
+
+def deleteOffer(request, oid):
+    offer = Offer.objects.get(id=oid)
+    offer.delete()
+    return render(request, 'customadmin/offer.html')
+
+
+
 
 def coupons(request):
     coupons = Coupons.objects.all()
@@ -275,7 +316,7 @@ def editcoupon(request, cid):
 
 def deletecoupon(request, cid):
 
-    coupon = Coupons.objects.filter(id=cid)
+    coupon = Coupons.objects.get(id=cid)
     coupon.delete()
     return redirect(coupons)
 

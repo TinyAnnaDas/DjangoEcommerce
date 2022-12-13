@@ -57,7 +57,7 @@
                                 
                                 <div class="product__item__pic set-bg " data-setbg="{{product.imageURL}}">
                                     <ul class="product__hover">
-                                        <li><a href="#"><img src="{% static 'images/icon/heart.png' %}" alt=""><span>Wishlist</span></a></li>
+                                        <li><a data-product = {{product.id}} class="addToWishlist" ><img src="{% static 'images/icon/heart.png' %}" alt=""><span>Wishlist</span></a></li>
                                         <li><a href="#"><img src="{% static 'images/icon/compare.png' %}" alt=""> <span>Compare</span></a>
                                         </li>
                                         <li><a href="{% url 'shop-details' product.id %}"><img src="{% static 'images/icon/search.png' %}" alt=""></a></li>
@@ -75,18 +75,22 @@
                                         <i class="fa fa-star-o"></i>
                                         <i class="fa fa-star-o"></i>
                                     </div>
-                                    <h5> &#8377; {{product.price|floatformat:2}}</h5>
-                                    <div class="product__color__select">
-                                        <label for="pc-4">
-                                            <input type="radio" id="pc-4">
-                                        </label>
-                                        <label class="active black" for="pc-5">
-                                            <input type="radio" id="pc-5">
-                                        </label>
-                                        <label class="grey" for="pc-6">
-                                            <input type="radio" id="pc-6">
-                                        </label>
-                                    </div>
+
+                                   
+
+                                        {% if product.offer  %}
+                                        <div class="row ">
+                                            <h5 class="text-danger col-md-5" style="text-decoration: line-through;"> &#8377; {{ product.price|floatformat:2}} </h5>
+                                            <h5 class="text-success "> &#8377; {{product.offer.offerPrice|floatformat:2 }}</h5>
+                                        </div>
+                                      
+
+                                        {% else %}
+                                            <h5> &#8377; {{product.price|floatformat:2}}</h5>
+                                        {% endif %}
+
+                                   
+
                                 </div>
                             </div>
                         </div>

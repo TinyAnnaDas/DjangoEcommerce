@@ -17,8 +17,12 @@
                         <div class="card-body">
                             <div class="shop__sidebar__categories">
                                 <ul class="nice-scroll">
-                                    {% for category in category %}
-                                    <li><a class="sidebar_category_links" href="{% url 'categoryview' category.category_name %}">{{category.category_name}} ({{category.products_set.all.count}})</a></li>
+                                    {% for category in categories %}
+                                        {% if category.offer %}
+                                        <li><a class="sidebar_category_links" href="{% url 'categoryview' category.category_name %}">{{category.category_name}} ({{category.products_set.all.count}})</a> <span class="text-success fw-bold">{{category.offer.discount}}% off</span></li>
+                                        {% else %}
+                                            <li><a class="sidebar_category_links" href="{% url 'categoryview' category.category_name %}">{{category.category_name}} ({{category.products_set.all.count}})</a></li>
+                                        {% endif %}
                                     {% endfor %}
                                 </ul>
                             </div>
