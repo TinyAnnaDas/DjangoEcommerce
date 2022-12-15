@@ -155,7 +155,7 @@ def editproduct(request,id):
         product.image1 = request.FILES.get('image1',product.image1)
         product.image2 = request.FILES.get('image2',product.image2)
         product.image3 = request.FILES.get('image3',product.image3)
-        product.offer_id = offer
+       
         
         
         product.save()

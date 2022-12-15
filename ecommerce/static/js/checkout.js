@@ -7,21 +7,21 @@ $(document).ready(function(){
     $('.payWithRazorpay').click(function(e){
         e.preventDefault();
 
-        var name = $("[name='name']").val()
-        var email = $("[email='email']").val()
-        var address = $("[address='address']").val()
-        var address1 = $("[address1='address1']").val()
-        var city = $("[city='city']").val()
-        var state = $("[state='state']").val()
-        var country = $("[country='country']").val()
-        var zipcode = $("[zipcode='zipcode']").val()
-        console.log(name)
+        // var name = $("[name='name']").val()
+        // var email = $("[email='email']").val()
+        // var address = $("[address='address']").val()
+        // var address1 = $("[address1='address1']").val()
+        // var city = $("[city='city']").val()
+        // var state = $("[state='state']").val()
+        // var country = $("[country='country']").val()
+        // var zipcode = $("[zipcode='zipcode']").val()
+        // console.log(name)
 
-        if (name == "" || email == "" || address == "" || address1 == "" || city == "" || state == "" || country == "" || zipcode == "" ){
+        // if (name == "" || email == "" || address == "" || address1 == "" || city == "" || state == "" || country == "" || zipcode == "" ){
         
-            swal("Alert", "All fields are mandatory!", "error");
-            return false
-        } else {
+        //     swal("Alert", "All fields are mandatory!", "error");
+        //     return false
+        // } else {
 
             var options = {
                 "key": "rzp_test_3wusM93Kj6imwz", // Enter the Key ID generated from the Dashboard
@@ -36,8 +36,8 @@ $(document).ready(function(){
                     processOrder()
                 },
                 "prefill": {
-                    "name": name,
-                    "email": email,
+                    // "name": name,
+                    // "email": email,
                     
                 },
                 "theme": {
@@ -46,47 +46,10 @@ $(document).ready(function(){
             };
             var rzp1 = new Razorpay(options);
             rzp1.open();
-        }
+        // }
 
     })
 
 });
 
-try{
-    var total = document.getElementById('carttotal').value
-
-    console.log('total: ', total)
-
-        function processOrder(){
-            console.log('payment button clicked')
-
-            var orderData = {
-                'shippingaddressId': document.getElementById('shippingaddressid').value,
-                'total':total,
-            }
-
-            var url = '/process_order/'
-
-            fetch (url, {
-                method: 'POST',
-                headers:{
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken':csrftoken,
-                },
-                body:JSON.stringify({'orderdata':orderData})
-            })
-
-            .then((response) => response.json())
-            .then((data) => { 
-                alert('Transaction completed')
-            })
-
-
-
-        }
-    }
-    
-catch{
-
-}
 

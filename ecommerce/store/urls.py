@@ -32,6 +32,8 @@ urlpatterns = [
     
     path('coupons/', views.coupons, name = 'coupons'),
 
+    path('order-complete/', views.order_complete, name = 'order_complete')
+
 
     
 ]

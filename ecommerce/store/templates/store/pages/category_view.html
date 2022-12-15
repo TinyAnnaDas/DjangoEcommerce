@@ -77,7 +77,22 @@
                                     <i class="fa fa-star-o"></i>
                                     <i class="fa fa-star-o"></i>
                                 </div>
-                                <h5> &#8377; {{product.price|floatformat:2}}</h5>
+                               
+                                {% if product.offer  %}
+    
+                                    <div class="row ">
+                                        <h5 class="text-danger col-md-5" style="text-decoration: line-through;"> &#8377; {{ product.price|floatformat:2}} </h5>
+                                        <h5 class="text-success "> &#8377; {{product.offerPrice|floatformat:2 }}</h5>
+                                    </div>
+                              
+
+                                {% else %}
+                                    <h5> &#8377; {{product.price|floatformat:2}}</h5>
+                                {% endif %}
+                                
+
+
+
                                 <div class="product__color__select">
                                     <label for="pc-4">
                                         <input type="radio" id="pc-4">

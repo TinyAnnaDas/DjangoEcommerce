@@ -51,14 +51,51 @@ def signin (request):
         return redirect(home)
     if request.method == 'POST':
         username = request.POST['username']
+        print(username)
         password = request.POST['password']
+        print(password)
         user = auth.authenticate(username=username, password = password)
         print(user)
         
         if user is not None:
             auth.login(request, user)
-            print(request.user.is_anonymous)
+            # print(request.user.is_anonymous)
             request.session['username'] = username
+           
+            device = request.COOKIES['device']
+
+            guest_customer = User.objects.get(device=device)
+           
+
+           
+            user_open_order = Order.objects.get(complete=False, status='Pending', user_id = request.user.id)
+            print(user_open_order)
+
+            guest_open_order = Order.objects.get(complete=False, status='Pending', user_id = guest_customer.id)
+            print(guest_open_order)
+
+            user_orderItem = OrderItem.objects.filter(order_id = user_open_order.id)
+            print(user_orderItem)
+
+            guest_orderItem = OrderItem.objects.filter(order_id = guest_open_order.id)
+            print(guest_orderItem)
+
+            # for i 
+
+            
+
+            
+                
+
+            
+ 
+           
+
+            
+
+        
+            
+            
             messages.error(request, 'Logged in Successfully')
             return redirect(home)
         else:
@@ -101,6 +138,7 @@ def otp(request):
 def home(request):
     data = cartData(request)
     cartItems = data['cartItems']
+    print(cartItems)
     order = data['order']
 
     products = Products.objects.all()
@@ -113,10 +151,14 @@ def categoryView (request, categoryname):
     if (Category.objects.filter(category_name=categoryname)):
         products = Products.objects.filter(category__category_name=categoryname)
         product_qty = Products.objects.filter(category__category_name=categoryname).count()
-        print(product_qty)
+        for product in products:
+            if product.offer:
+                print(product.offerPrice)
+                
+                
 
     categories = Category.objects.all()
-    context= {'products':products, 'categories':categories, 'product_qty':product_qty}
+    context= {'products':products, 'categories':categories, }
     return render(request, 'store/pages/category_view.html', context)
 
 
@@ -139,6 +181,17 @@ def store(request):
     products = Products.objects.all()
 
     categories = Category.objects.all()
+
+    for product in products:
+            if product.offer:
+                print(product.name)
+                print(product.price)
+                print(product.offer.discount)
+                print(product.offerPrice)
+
+                # offer_price_decimal = product.price - (product.price * decimal.Decimal(product.offer.discount) * decimal.Decimal(0.01))
+                # offer_price = int(offer_price_decimal)
+               
     
     for category in categories:
         if category.offer:
@@ -149,7 +202,7 @@ def store(request):
             # i.products_set.price = i.offer.offerPrice
    
     
-    context = {'products':products, 'cartItems':cartItems,'order':order, 'categories':categories,}
+    context = {'products':products, 'cartItems':cartItems,'order':order, 'categories':categories, }
     return render(request, 'store/store.html', context)
 
 def shop_details(request,id):
@@ -217,13 +270,17 @@ def updateItem(request):
         action = request.POST.get('action')
         print('Action:',action)
         print('productId:',productId)
-        try:
-            customer = request.user.id
-        except:
+
+        if request.user.is_authenticated:
+            customer = request.user
+        else:
             device = request.COOKIES['device']
+            print(device)
             customer, created = User.objects.get_or_create(device=device)
+            print(customer.device)
+
         product = Products.objects.get(id=productId)
-        order, created = Order.objects.get_or_create(user=customer,complete = False)
+        order, created = Order.objects.get_or_create(user=customer,complete = False, status='Pending')
 
         orderItem, created = OrderItem.objects.get_or_create(order=order, product=product)
 
@@ -235,9 +292,9 @@ def updateItem(request):
             if orderItem.quantity !=1:
                 orderItem.quantity = (orderItem.quantity - 1)
                 messages = 'Item removed from cart'
-                # if orderItem.quantity <= 0:
-                #     orderItem.delete()
+  
         orderItem.save()
+        print(orderItem.order_id)
 
         if action == 'delete':
             orderItem.delete()
@@ -446,3 +503,7 @@ def view_invoice(request, order_id):
     if pisa_status.err:
         return HttpResponse('We had some errors <pre>' + html + '</pre>')
     return response
+
+def order_complete(request):
+    context = {}
+    return render (request, 'store/pages/order_complete.html', context)

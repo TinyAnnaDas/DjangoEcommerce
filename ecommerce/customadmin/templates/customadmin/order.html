@@ -18,6 +18,7 @@
                 <thead>
                     <tr>
                         <th>Customer</th>
+                        <th>Device Id</th>
                         <th>Order Id</th>
                         <th>Date Ordered</th>
                         <th>Complete</th>
@@ -35,6 +36,7 @@
                     {% for order in orders %}
                     <tr>
                         <td>{{order.user.first_name}}</td>
+                        <td><small>{{order.user.device}}</small></td>
                         <td>{{order.id}}</td>
                         <td>{{order.date_ordered}}</td>
                         <td>{{order.complete}}</td>
@@ -50,7 +52,7 @@
                    
                   
               
-                    <!-- Modal Block User-->
+                    <!-- Modal Orderitem -->
                   
  
                             <div class="modal fade" id="blockModal{{order.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">

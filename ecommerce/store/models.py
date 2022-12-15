@@ -11,7 +11,7 @@ class User(AbstractUser):
     device = models.CharField(max_length=200, null=True, blank=True)
 
     def __str__(self):
-        return self.first_name
+        return str(self.id)
 
 
 
@@ -22,18 +22,13 @@ class Offer(models.Model):
     valid_to = models.DateTimeField(null=True, blank=True)
     is_active = models.BooleanField(default=False)
 
-    @property
-    def offerPrice(self):
-
-        for product in self.products_set.all():
-            offerPrice_decimal = product.price - (product.price * decimal.Decimal(self.discount) * decimal.Decimal(0.01))
-            offerPrice = int(offerPrice_decimal)
-        return offerPrice
+   
 
 class Category(models.Model):
     category_name=models.CharField(max_length=50)
     image= models.ImageField(upload_to="images",default="")
     offer = models.ForeignKey(Offer,on_delete=models.SET_NULL, null=True, blank=True)
+    
 
 
     def __str__(self):
@@ -56,11 +51,21 @@ class Products(models.Model):
     trending = models.BooleanField(default=False, help_text="0=default, 1=Trending")
     date_created = models.DateTimeField(auto_now_add=True, null=True)
     offer = models.ForeignKey(Offer,on_delete=models.SET_NULL, null=True, blank=True)
+   
 
 
     def __str__(self):
         return str(self.name)
-
+        
+    @property
+    def offerPrice(self):
+        offerPrice_decimal = self.price - (self.price * decimal.Decimal(self.offer.discount) * decimal.Decimal(0.01))
+        offerPrice = int(offerPrice_decimal)
+        print(self.name + " MODEL")
+        print(str(offerPrice) + " MODEL")
+        return offerPrice
+            
+           
     
     
     @property
@@ -156,7 +161,10 @@ class OrderItem(models.Model):
 
     @property
     def get_total(self):
-        total = self.product.price * self.quantity
+        if self.product.offer:
+            total = self.product.offerPrice * self.quantity
+        else:
+            total = self.product.price * self.quantity
         return total
 
 class Coupons(models.Model):
