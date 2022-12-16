@@ -142,14 +142,23 @@ class Order(models.Model):
     @property
     def get_cart_total(self):
         orderitems = self.orderitem_set.all()
-        total = sum([item.get_total for item in orderitems])
-        return total
+        try:
+            total = sum([item.get_total for item in orderitems])
+      
+            return total
+        except:
+            pass
 
     @property
     def get_cart_items(self):
         orderitems = self.orderitem_set.all()
-        total = sum([item.quantity for item in orderitems])
-        return total
+        try:
+            total = sum([item.quantity for item in orderitems])
+        
+            return total
+
+        except:
+            pass
 
 
 
@@ -161,11 +170,14 @@ class OrderItem(models.Model):
 
     @property
     def get_total(self):
-        if self.product.offer:
-            total = self.product.offerPrice * self.quantity
-        else:
-            total = self.product.price * self.quantity
-        return total
+        try:
+            if self.product.offer:
+                total = self.product.offerPrice * self.quantity
+            else:
+                total = self.product.price * self.quantity
+                return total
+        except:
+            pass
 
 class Coupons(models.Model):
     couponcode = models.CharField(max_length=200, null=True)

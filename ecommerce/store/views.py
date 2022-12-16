@@ -74,30 +74,43 @@ def signin (request):
             guest_open_order = Order.objects.get(complete=False, status='Pending', user_id = guest_customer.id)
             print(guest_open_order)
 
-            user_orderItem = OrderItem.objects.filter(order_id = user_open_order.id)
-            print(user_orderItem)
+            user_orderItems = OrderItem.objects.filter(order_id = user_open_order.id)
+            print(user_orderItems)
 
-            guest_orderItem = OrderItem.objects.filter(order_id = guest_open_order.id)
-            print(guest_orderItem)
+            guest_orderItems = OrderItem.objects.filter(order_id = guest_open_order.id)
+            print(guest_orderItems)
 
-            # for i 
+            for g_orderitem in guest_orderItems:
+                print(g_orderitem.product.name)
+                print(g_orderitem.product)
+                print(g_orderitem.quantity)
 
-            
-
-            
-                
-
-            
- 
-           
-
-            
-
+                for u_orderitem in user_orderItems:
+                    if user_orderItems.filter(product=g_orderitem.product):
+                    # if guestuser's orderitem's product is present in current user's orderitems
+                    # then check if the user orderitem (inner loop) is equal to the guest useritem (outerloop)
+                        if u_orderitem.product == g_orderitem.product:
+                            u_orderitem.quantity = u_orderitem.quantity + g_orderitem.quantity
+                            u_orderitem.save()
+                        
+                    else:
+                        # create a new order item with product from the guest user. 
+                        product = g_orderitem.product
+                        new_orderitem = OrderItem.objects.create(order = user_open_order, product = product)
         
-            
+                        new_orderitem.quantity = new_orderitem.quantity + g_orderitem.quantity
+                        new_orderitem.save()
+                        
+
+            guest_customer.delete()
+
             
             messages.error(request, 'Logged in Successfully')
-            return redirect(home)
+
+            if 'next' in request.POST:
+                return redirect(request.POST.get('next'))
+            else:
+                return redirect(home)
         else:
             messages.error(request, 'Invalid Credintials!!!')
             return redirect(signin)
@@ -280,6 +293,7 @@ def updateItem(request):
             print(customer.device)
 
         product = Products.objects.get(id=productId)
+        print(product)
         order, created = Order.objects.get_or_create(user=customer,complete = False, status='Pending')
 
         orderItem, created = OrderItem.objects.get_or_create(order=order, product=product)
