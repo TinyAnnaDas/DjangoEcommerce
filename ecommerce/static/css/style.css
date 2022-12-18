@@ -484,7 +484,15 @@ ol {
 	position: relative;
 }
 
-.header__nav__option a span {
+.header__nav__option a:nth-last-child(3) span {
+	color: #0d0d0d;
+	font-size: 10px;
+	position: absolute;
+	left: 6px;
+	top: 6px;
+}
+
+.header__nav__option a:nth-last-child(2) span {
 	color: #0d0d0d;
 	font-size: 11px;
 	position: absolute;
@@ -1089,6 +1097,28 @@ ol {
 	padding-left: 20px;
 	border: 1px solid #e5e5e5;
 	height: 42px;
+}
+.search:focus{
+	border-color: #009a7b;
+}
+
+.results-card{
+	width: 100%;
+	box-shadow: 0 8px 8px 0 rgba(0,0,0,0.25);
+	transition: 0.5s;
+	border-radius: 7px;
+	padding: 15px 15px;
+	margin: 0 auto;
+}
+
+.search_item{
+	text-decoration: none;
+}
+
+.search-img{
+	width: 50px;
+	height: 60px;
+	border-radius: 50%;
 }
 
 .shop__sidebar__search form input::-webkit-input-placeholder {

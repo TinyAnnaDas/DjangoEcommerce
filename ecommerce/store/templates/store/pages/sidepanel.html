@@ -2,10 +2,13 @@
 <div class="col-lg-3">
     <div class="shop__sidebar">
         <div class="shop__sidebar__search">
-            <form action="#">
-                <input type="text" placeholder="Search...">
+            <form id="search-form">
+                {% csrf_token %}
+                <input type="text" id="search-input" class="search" name="q" placeholder="Search...">
                 <button type="submit"><span class="icon_search"></span></button>
+                
             </form>
+            <div id="results-box" class="results-card d-none"></div>
         </div>
         <div class="shop__sidebar__accordion">
             <div class="accordion" id="accordionExample">
@@ -19,7 +22,7 @@
                                 <ul class="nice-scroll">
                                     {% for category in categories %}
                                         {% if category.offer %}
-                                        <li><a class="sidebar_category_links" href="{% url 'categoryview' category.category_name %}">{{category.category_name}} ({{category.products_set.all.count}})</a> <span class="text-success fw-bold">{{category.offer.discount}}% off</span></li>
+                                            <li><a class="sidebar_category_links" href="{% url 'categoryview' category.category_name %}">{{category.category_name}} ({{category.products_set.all.count}})</a> <span class="text-success fw-bold">{{category.offer.discount}}% off</span></li>
                                         {% else %}
                                             <li><a class="sidebar_category_links" href="{% url 'categoryview' category.category_name %}">{{category.category_name}} ({{category.products_set.all.count}})</a></li>
                                         {% endif %}
@@ -162,6 +165,78 @@
 </div>
 
 <script>
+
+    const f_url = window.location.href
+    const searchForm = document.getElementById('search-form')
+    const searchInput = document.getElementById('search-input')
+    const resultsBox = document.getElementById('results-box')
+    const csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value
+
+
+    const sendSearchData = (item) => {
+
+        $.ajax({
+            type: 'POST',
+            url: '/shop/search/',
+            data:{
+                'csrfmiddlewaretoken': csrf,
+                'search_products': item
+            },
+            success: (res) => {
+               
+                const data = res.data
+
+                if (Array.isArray(data)){
+                    resultsBox.innerHTML = ""
+                    data.forEach( search_products => {
+                        resultsBox.innerHTML += `
+                            <a href="" class="search_item" > 
+                                <div class="row mt-2 mb-2"> 
+                                    <div class="col-4"> 
+                                        <img src="${search_products.image}"" class="search-img"> 
+                                    </div>
+                                    <div class="col-8 my-auto"> 
+                                        <h6>${search_products.name}</h6>
+                                    </div>
+                                </div>
+                            </a> 
+                        `
+                    })
+                }else{
+                    if (searchInput.value.length > 0){
+                        resultsBox.innerHTML = `<b>${data}</b>`
+                    } else {
+                        resultsBox.classList.add('d-none')
+                    }
+                }
+
+
+            },
+            error: (err) => {
+                console.log(err)
+            }
+
+        })
+
+    }
+
+
+
+    searchInput.addEventListener('keyup', e => {
+        console.log(e.target.value)
+        if (resultsBox.classList.contains('d-none')){
+            resultsBox.classList.remove('d-none')
+        }
+
+        sendSearchData (e.target.value)
+    })
+
+    
+
+
+
+
+    // Active link for the selected category
     const currentlocation = location.href
     console.log(location.href)
     const sidelinks = document.getElementsByClassName("sidebar_category_links")

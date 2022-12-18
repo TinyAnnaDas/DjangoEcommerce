@@ -176,7 +176,7 @@ def deleteproduct(request, id):
 
 
 def order(request):
-    orders = Order.objects.all()
+    orders = Order.objects.all().order_by('-id')
     context = {'orders':orders}
     return render(request, 'customadmin/order.html', context)
 

@@ -456,43 +456,43 @@ document.getElementById('make-payment').addEventListener('click', function(e){
 
     try{
     
-        var total = document.getElementById('coupon-cart-total').value
-    
-        if (total == null || total == undefined){
-            var total = document.getElementById('carttotal').value
-        }
-    
-        console.log('total: ', total)
-    
-            function processOrder(){
-                console.log('payment button clicked')
-    
-                var orderData = {
-                    'shippingaddressId': document.getElementById('shippingaddressid').value,
-                    'total':total,
-                }
-                
-                var url = '/process_order/'
-    
-                fetch (url, {
-                    method: 'POST',
-                    headers:{
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken':csrftoken,
-                    },
-                    body:JSON.stringify({'orderdata':orderData})
-                })
-    
-                .then((response) => response.json())
-                .then((data) => { 
-                    console.log('success:',data)
-                    alert('Transaction completed')
-                    window.location.href = "{% url 'order_complete' %}"
-                })
-    
-    
-    
+            var total = document.getElementById('coupon-cart-total').value
+        
+            if (total == null || total == undefined){
+                var total = document.getElementById('carttotal').value
             }
+        
+                console.log('total: ', total)
+        
+                function processOrder(){
+                    console.log('payment button clicked')
+        
+                    var orderData = {
+                        'shippingaddressId': document.getElementById('shippingaddressid').value,
+                        'total':total,
+                    }
+                    
+                    var url = '/process_order/'
+        
+                    fetch (url, {
+                        method: 'POST',
+                        headers:{
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken':csrftoken,
+                        },
+                        body:JSON.stringify({'orderdata':orderData})
+                    })
+        
+                    .then((response) => response.json())
+                    .then((data) => { 
+                        console.log('success:',data)
+                        //alert('Transaction completed')
+                        window.location.href = "{% url 'order_complete' %}"
+                    })
+        
+        
+        
+                }
         }
         
     catch{

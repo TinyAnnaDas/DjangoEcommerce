@@ -14,6 +14,7 @@ from .models import *
 from .utils import *
 from xhtml2pdf import pisa
 from django.template.loader import get_template
+from django.core.paginator import Paginator
 
 # Create your views here.
 
@@ -155,7 +156,9 @@ def home(request):
     order = data['order']
 
     products = Products.objects.all()
-    context = {'products':products, 'cartItems':cartItems,'order':order,}
+
+    wishlistcount = Wishlist.objects.all().count()
+    context = {'products':products, 'cartItems':cartItems,'order':order, 'wishlistcount':wishlistcount}
     return render(request, 'store/home.html', context)
 
 
@@ -167,11 +170,16 @@ def categoryView (request, categoryname):
         for product in products:
             if product.offer:
                 print(product.offerPrice)
-                
-                
 
+            
+                
+                
+    data = cartData(request)
+    cartItems = data['cartItems']
+    order = data['order']
+    wishlistcount = Wishlist.objects.all().count()
     categories = Category.objects.all()
-    context= {'products':products, 'categories':categories, }
+    context= {'products':products, 'categories':categories,'cartItems':cartItems, 'order':order, 'wishlistcount':wishlistcount }
     return render(request, 'store/pages/category_view.html', context)
 
 
@@ -179,44 +187,72 @@ def profile(request):
     return render(request, 'store/pages/profile.html')
 
 
-def wishlist(request):
-    return render(request, 'store/pages/wishlist.html')
+# def wishlist(request):
+#     return render(request, 'store/pages/wishlist.html')
 
 def coupons(request):
     return render(request, 'store/pages/coupons.html')
 
     
 def store(request):
+
+    ordering = request.GET.get('ordering', "")
+    print(ordering)
+
+    
+
+    # if 'q' in request.GET:
+    #     q=request.GET['q']
+    #     products = Products.objects.filter(name__icontains=q).order_by('-id')
+    #     filter_count = Products.objects.filter(name__icontains=q).order_by('-id').count()
+    # else:
+    products = Products.objects.all().order_by('-id')
+
+    if ordering:
+        products = products.order_by(ordering)
+
+    #pagination
+    paginator = Paginator(products, 12)
+    page_num = request.GET.get('page', 1)
+    products = paginator.page(page_num)
+
+
     data = cartData(request)
     cartItems = data['cartItems']
     order = data['order']
     offer = Offer.objects.all()
-    products = Products.objects.all()
-
     categories = Category.objects.all()
 
-    for product in products:
-            if product.offer:
-                print(product.name)
-                print(product.price)
-                print(product.offer.discount)
-                print(product.offerPrice)
-
-                # offer_price_decimal = product.price - (product.price * decimal.Decimal(product.offer.discount) * decimal.Decimal(0.01))
-                # offer_price = int(offer_price_decimal)
-               
-    
-    for category in categories:
-        if category.offer:
-            print(category.products_set.all())
-            for product in category.products_set.all():
-                # product.price = category.offer.pOfferPrice
-                print(product.price)
-            # i.products_set.price = i.offer.offerPrice
+    wishlistcount = Wishlist.objects.all().count()
    
     
-    context = {'products':products, 'cartItems':cartItems,'order':order, 'categories':categories, }
+    context = {'products':products, 'cartItems':cartItems,'order':order, 'categories':categories, 'wishlistcount':wishlistcount}
     return render(request, 'store/store.html', context)
+
+
+def search_results(request):
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest': # instead of request.is_ajax which is depreciated
+        res = None
+        search_products = request.POST.get('search_products')
+        qs = Products.objects.filter(name__icontains=search_products)
+        if len(qs) > 0 and len(search_products) > 0:
+            data = []
+            for pos in qs:
+                item = {
+                    'pk': pos.pk, 
+                    'name': pos.name,
+                    'image':str(pos.imageURL)
+                    #'category':pos.category -> Got an error object of type Category is not JSON serializable
+                }
+                data.append(item)
+                res = data
+        else:
+            res = 'No products found!'
+
+        return JsonResponse({'data': res})
+
+    return JsonResponse({})
+
 
 def shop_details(request,id):
     if request.user.is_authenticated:
@@ -316,6 +352,7 @@ def updateItem(request):
 
         
         print(orderItem.product.name)
+        print(order.get_cart_total)
         
         
 
@@ -399,7 +436,9 @@ def processOrder(request):
    
 
     if total == float(order.get_cart_total):
+        print(total == float(order.get_cart_total))
         order.complete = True
+        order.status = 'Confirmed'
 
 
     shippingaddressId = int(data ['orderdata']['shippingaddressId'])
@@ -438,9 +477,14 @@ def processOrder(request):
 
 @login_required(login_url='signin')
 def wishlist(request):
+    data = cartData(request)
+    cartItems = data['cartItems']
+    order = data['order']
+
     wishlist = Wishlist.objects.filter(user=request.user)
     wishlistcount = Wishlist.objects.all().count()
-    context = {'wishlist':wishlist, 'wishlistcount':wishlistcount}
+
+    context = {'wishlist':wishlist, 'wishlistcount':wishlistcount, 'cartItems':cartItems, 'order':order}
     return render (request, 'store/pages/wishlist.html', context)
 
 def addToWishlist(request):
@@ -453,7 +497,8 @@ def addToWishlist(request):
                     return JsonResponse({'status': "Product already in wishlist"})
                 else:
                     Wishlist.objects.create(user = request.user, product_id=product_id)
-                    return JsonResponse({'status': "Product added to wishlist"})
+                    wishlistcount = Wishlist.objects.all().count()
+                    return JsonResponse({'status': "Product added to wishlist", 'wishlistcount': wishlistcount})
             else:
                 return JsonResponse({'status': "No such product found"})
         else:
@@ -465,7 +510,8 @@ def deleteFromWishlist(request):
         product_id = int(request.POST.get('productId'))
         delete_wishlist = Wishlist.objects.filter(user=request.user, product_id=product_id)
         delete_wishlist.delete()
-        return JsonResponse({'status': "item  removed from wishlist"})
+        wishlistcount = Wishlist.objects.all().count()
+        return JsonResponse({'status': "item  removed from wishlist", "wishlistcount":wishlistcount})
 
 
 def myOrders(request):
@@ -474,7 +520,7 @@ def myOrders(request):
     order = data['order']
 
     customer = request.user
-    orders = customer.order_set.all()
+    orders = customer.order_set.all().order_by('-id')
    
     
     context = {'orders': orders, 'cartItems':cartItems,'order':order,}
@@ -519,5 +565,9 @@ def view_invoice(request, order_id):
     return response
 
 def order_complete(request):
-    context = {}
+    data = cartData(request)
+    cartItems = data['cartItems']
+    order = data['order']
+    wishlistcount = Wishlist.objects.all().count()
+    context = {'cartItems':cartItems,'order':order, 'wishlistcount':wishlistcount }
     return render (request, 'store/pages/order_complete.html', context)

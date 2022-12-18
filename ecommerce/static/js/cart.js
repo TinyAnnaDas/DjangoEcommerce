@@ -127,7 +127,7 @@ for(var i =0; i < updateWishlist.length; i++ ){
         var productId = this.dataset.product
         
         console.log('productId:',productId)
-        console.log('USER:', user)
+        // console.log('USER:', user)
 
         addToWishlist(productId)
 
@@ -149,7 +149,12 @@ function addToWishlist(productId){
         },
         
         success: function (response) {
+            if (response.wishlistcount){
+                document.getElementById("wishlistcount").innerHTML = response.wishlistcount
+            }
+                
             alertify.success(response.status);
+
         }
     });
 }

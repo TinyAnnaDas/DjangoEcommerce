@@ -61,8 +61,6 @@ class Products(models.Model):
     def offerPrice(self):
         offerPrice_decimal = self.price - (self.price * decimal.Decimal(self.offer.discount) * decimal.Decimal(0.01))
         offerPrice = int(offerPrice_decimal)
-        print(self.name + " MODEL")
-        print(str(offerPrice) + " MODEL")
         return offerPrice
             
            
@@ -141,13 +139,14 @@ class Order(models.Model):
 
     @property
     def get_cart_total(self):
-        orderitems = self.orderitem_set.all()
         try:
+            orderitems = self.orderitem_set.all()
             total = sum([item.get_total for item in orderitems])
-      
+        
             return total
         except:
             pass
+       
 
     @property
     def get_cart_items(self):
@@ -170,14 +169,15 @@ class OrderItem(models.Model):
 
     @property
     def get_total(self):
-        try:
-            if self.product.offer:
-                total = self.product.offerPrice * self.quantity
-            else:
-                total = self.product.price * self.quantity
-                return total
-        except:
-            pass
+        if self.product.offer:
+            total = self.product.offerPrice * self.quantity
+            
+            return total
+        else:
+            print(self.product.price)
+            total = self.product.price * self.quantity
+            return total
+    
 
 class Coupons(models.Model):
     couponcode = models.CharField(max_length=200, null=True)
