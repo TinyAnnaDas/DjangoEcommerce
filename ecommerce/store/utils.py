@@ -7,8 +7,13 @@ def cartData(request):
     if request.user.is_authenticated:
         customer = request.user
     else:
-        device = request.COOKIES['device']
-        customer, created = User.objects.get_or_create(device=device)
+        try:
+            device = request.COOKIES['device']
+        except:
+            device = {}
+      
+            # device = ''
+        customer, created = User.objects.get_or_create(device=device, username = device)
         print(customer.device)
 
     order, created = Order.objects.get_or_create(user=customer, complete=False, status='Pending')
@@ -17,11 +22,11 @@ def cartData(request):
    
     cartItems = order.get_cart_items
     
-    shippingaddress = customer.shippingaddress_set.all()
+    
 
-    # shippingaddress = ''
+  
 
-    return {'cartItems':cartItems, 'order':order, 'items':items, 'shippingaddress':shippingaddress,}
+    return {'cartItems':cartItems, 'order':order, 'items':items,}
 
 def guestOrder(request, data):
     print('User is not logged in..')

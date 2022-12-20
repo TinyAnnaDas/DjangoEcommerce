@@ -25,6 +25,8 @@ urlpatterns = [
     path('add_coupon/', views.addCoupon, name='add_coupon'),
     path('account/', views.profile, name = 'account'),
     path('orders/', views.myOrders, name = 'orders'),
+     path('cancel_order/', views.cancelOrder, name = 'cancel-order'),
+    
     path('wishlist/', views.wishlist, name = 'wishlist'),
     path('add_to_wishlist/', views.addToWishlist, name = 'add_to_wishlist'), 
     path('delete_from_wishlist/', views.deleteFromWishlist, name = 'delete_from_wishlist'), 

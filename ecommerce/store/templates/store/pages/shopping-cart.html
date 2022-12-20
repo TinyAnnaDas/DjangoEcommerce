@@ -63,7 +63,7 @@
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td class="cart__price " id="{{item.product.id}}total" >&#8377; {{item.get_total}}</td>
+                                            <td class="cart__price " id="{{item.product.id}}total" >&#8377; {{item.get_total|floatformat:2}}</td>
                                             <td class="cart__close "><i data-product = {{item.product.id}} data-action="delete" class="fa fa-close update-cart"></i></td>
                                         </tr>
                                 
@@ -94,17 +94,26 @@
                       
                     </div>
                 </div>
-                <div class="col-lg-4">
-               
-                    <div class="cart__total">
-                        <h6>Cart total</h6>
-                        <ul>
-                            <li>Items <span class="cartqty">{{order.get_cart_items}}</span></li>
-                            <li>Total <span class="cartotal">&#8377; {{order.get_cart_total}}</span></li>
-                        </ul>
-                        <a href="{% url 'checkout' %}" class="primary-btn">Proceed to checkout</a>
+                {% if order.get_cart_items%}
+                    <div class="col-lg-4">
+                        <div class="cart__total">
+                            <h6>Cart total</h6>
+                            <ul>
+                                <li>Items <span class="cartqty">{{order.get_cart_items}}</span></li>
+                                <li>Total <span class="cartotal">&#8377; {{order.get_cart_total|floatformat:2}}</span></li>
+                            </ul>
+                            <a href="{% url 'checkout' %}" class="primary-btn">Proceed to checkout</a>
+                        </div>
                     </div>
-                </div>
+                {% else %}
+
+                    <div class="col-lg-4">
+                    
+                    </div>
+                        
+                {% endif %}
+
+               
             </div>
         </div>
     </section>

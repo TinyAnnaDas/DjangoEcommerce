@@ -198,7 +198,7 @@
                         
                         
                         <a href="{% url 'cart' %}"><img src="{% static 'images/icon/cart.png' %}" alt=""> <span class="cartqty">{{cartItems}}</span></a>
-                        <div class="price cartotal">&#8377; {{order.get_cart_total}}</div>
+                        <div class="price cartotal">&#8377; {{order.get_cart_total|floatformat:2}}</div>
                     </div>
                 </div>
             </div>

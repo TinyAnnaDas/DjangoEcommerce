@@ -88,10 +88,14 @@
                                 <i class="fa fa-star-o"></i>
                                 <span> - 5 Reviews</span>
                             </div>
-                            <h3>$270.00 <span>70.00</span></h3>
-                            <p>Coat with quilted lining and an adjustable hood. Featuring long sleeves with adjustable
-                                cuff tabs, adjustable asymmetric hem with elastic side tabs and a front zip fastening
-                            with placket.</p>
+                         
+                            {% if product.offer %}
+                                <h3>&#8377;{{ product.price|floatformat:2}} <span class="text-danger">&#8377;{{ product.offerPrice|floatformat:2}}</span></h3>
+                            {% else %}
+                                <h3>&#8377;{{ product.price}} </h3>
+                            {% endif %}
+                     
+                            <p>{{product.description}}</p>
                             <div class="product__details__option">
                                 <div class="product__details__option__size">
                                     <span>Size:</span>
@@ -128,12 +132,17 @@
                                 </div>
                             </div>
                             <div class="product__details__cart__option">
+                                {% if product.stock == 0 %}
+                                <h3 class="text-danger">Out of Stock</h3>
+                                {% else %}
                                 <div class="quantity">
                                     <div class="pro-qty">
                                         <input type="text" value="1">
                                     </div>
                                 </div>
+                               
                                 <a href="#" class="primary-btn update-cart">add to cart</a>
+                                {% endif %}
                             </div>
                             <div class="product__details__btns__option">
                                 <a href="#"><i class="fa fa-heart"></i> add to wishlist</a>
@@ -144,14 +153,14 @@
                                 <img src="{% static 'images/shop-details/details-payment.png' %}" alt="">
                                 <ul>
                                     <li><span>SKU:</span> 3812912</li>
-                                    <li><span>Categories:</span> Clothes</li>
+                                    <li><span>Categories:</span> {{product.category.category_name}}</li>
                                     <li><span>Tag:</span> Clothes, Skin, Body</li>
                                 </ul>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="row">
+                <!-- <div class="row">
                     <div class="col-lg-12">
                         <div class="product__details__tab">
                             <ul class="nav nav-tabs" role="tablist">
@@ -270,24 +279,17 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> -->
             </div>
         </div>
     </section>
 
 
-    <div class="magnify">
-        <div class="magnifier" style= "background-image: url(./PinkAnthurium.png);"></div>
-        <div class="magnified">
-          <img src="{{ product.imageURL }}"/>
-        </div>
-    </div>
-
 
     <!-- Shop Details Section End -->
 
     <!-- Related Section Begin -->
-    <!-- <section class="related spad">
+<section class="related spad">
         <div class="container">
             <div class="row">
                 <div class="col-lg-12">
@@ -435,7 +437,7 @@
                 </div>
             </div>
         </div>
-    </section> -->
+    </section> 
 
     
     <!-- Related Section End -->

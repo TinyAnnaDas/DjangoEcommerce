@@ -26,7 +26,12 @@
                 <br>
                 <div class="form-group ">
                     <label for=""><strong>Price</strong></label>
-                    <input value="{{product.price}}" name="price" type="text" class="form-control" placeholder="Price">
+                    <input value="{{product.price}}" name="price" type="number" class="form-control" placeholder="Price">
+                </div>
+                <br>
+                <div class="form-group ">
+                    <label for=""><strong>Stock</strong></label>
+                    <input value="{{product.stock}}" name="stock" type="number" class="form-control" placeholder="Stock">
                 </div>
                 <br>
                 <div class="form-group">
@@ -112,14 +117,14 @@
                     <label for="category">Choose a Category:</label>
                         <select name="category" id="category" >
                           
-                        {% for category in category %}
-                        {% if  category.category_name == product.category.category_name %}
-                            <option value="{{product.category_id}}" selected>{{product.category.category_name}}</option>
-                        {%else %}
-                            <option value="{{category.id}}">{{category.category_name}}</option>
+                            {% for category in category %}
+                            {% if  category.category_name == product.category.category_name %}
+                                <option value="{{product.category_id}}" selected>{{product.category.category_name}}</option>
+                            {%else %}
+                                <option value="{{category.id}}">{{category.category_name}}</option>
 
-                        {% endif %}
-                        {% endfor %}
+                            {% endif %}
+                            {% endfor %}
                         </select>
                         
                 </div>

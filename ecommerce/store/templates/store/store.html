@@ -69,7 +69,12 @@
                                     
                                     <h6>{{product.name}}</h6>
                                     {% csrf_token %}
-                                    <a data-product = {{product.id}} data-action="add" class="update-cart">+ Add To Cart</a>
+
+                                    {% if product.stock == 0 %}
+                                       <a class="text-danger " style="font-size: 1.25rem;"> Out of Stock </a>
+                                    {% else %}
+                                        <a data-product = {{product.id}} data-action="add" class="update-cart">+ Add To Cart</a>
+                                    {% endif %}
                                     <div class="rating">
                                         <i class="fa fa-star-o"></i>
                                         <i class="fa fa-star-o"></i>

@@ -68,9 +68,11 @@ def signin (request):
             guest_customer = User.objects.get(device=device)
            
 
-           
-            user_open_order = Order.objects.get(complete=False, status='Pending', user_id = request.user.id)
+            user_open_order, created = Order.objects.get_or_create(complete=False, status='Pending', user_id = request.user.id)
             print(user_open_order)
+          
+          
+            
 
             guest_open_order = Order.objects.get(complete=False, status='Pending', user_id = guest_customer.id)
             print(guest_open_order)
@@ -104,6 +106,7 @@ def signin (request):
                         
 
             guest_customer.delete()
+            guest_open_order.delete()
 
             
             messages.error(request, 'Logged in Successfully')
@@ -115,8 +118,18 @@ def signin (request):
         else:
             messages.error(request, 'Invalid Credintials!!!')
             return redirect(signin)
+
+    data = cartData(request)
+    cartItems = data['cartItems']
+    print(cartItems)
+    order = data['order']
+    try:
+     wishlistcount = Wishlist.objects.filter(user=user).count()
+    except:
+        wishlistcount = '0'
+    context = {'cartItems':cartItems,'order':order, 'wishlistcount':wishlistcount}
         
-    return render(request,'store/signin.html')
+    return render(request,'store/signin.html', context)
 
 
 def otplogin(request):
@@ -144,6 +157,7 @@ def otp(request):
             auth.login(request,user)
            
             return redirect('home')
+
     return render(request, 'store/otp.html')
 
 
@@ -157,7 +171,8 @@ def home(request):
 
     products = Products.objects.all()
 
-    wishlistcount = Wishlist.objects.all().count()
+    user=request.user.id
+    wishlistcount = Wishlist.objects.filter(user=user).count()
     context = {'products':products, 'cartItems':cartItems,'order':order, 'wishlistcount':wishlistcount}
     return render(request, 'store/home.html', context)
 
@@ -177,7 +192,8 @@ def categoryView (request, categoryname):
     data = cartData(request)
     cartItems = data['cartItems']
     order = data['order']
-    wishlistcount = Wishlist.objects.all().count()
+    user=request.user.id
+    wishlistcount = Wishlist.objects.filter(user=user).count()
     categories = Category.objects.all()
     context= {'products':products, 'categories':categories,'cartItems':cartItems, 'order':order, 'wishlistcount':wishlistcount }
     return render(request, 'store/pages/category_view.html', context)
@@ -223,7 +239,8 @@ def store(request):
     offer = Offer.objects.all()
     categories = Category.objects.all()
 
-    wishlistcount = Wishlist.objects.all().count()
+    user=request.user.id
+    wishlistcount = Wishlist.objects.filter(user=user).count()
    
     
     context = {'products':products, 'cartItems':cartItems,'order':order, 'categories':categories, 'wishlistcount':wishlistcount}
@@ -268,8 +285,9 @@ def shop_details(request,id):
         cartTotal = order['get_cart_total']
 
     product = Products.objects.get(id=id)
-    print(product.imageURL)
-    context = {'product':product,'cartItems':cartItems,'cartTotal':cartTotal}
+    user=request.user.id
+    wishlistcount = Wishlist.objects.filter(user=user).count()
+    context = {'product':product,'cartItems':cartItems,'cartTotal':cartTotal,'wishlistcount':wishlistcount}
     return render (request, 'store/pages/shop-details.html', context)
 
 
@@ -295,7 +313,11 @@ def cart(request):
     order = data['order']
     items = data['items']
 
-    context = {'items':items, 'order':order, 'cartItems':cartItems,}
+    
+    user=request.user.id
+    wishlistcount = Wishlist.objects.filter(user=user).count()
+
+    context = {'items':items, 'order':order, 'cartItems':cartItems,'wishlistcount':wishlistcount}
     return render(request, 'store/pages/shopping-cart.html', context)
     
 @login_required(login_url='signin')
@@ -307,9 +329,15 @@ def checkout(request):
     items = data['items']
     # coupon = data['coupon']
     # coupon_code_message = data['coupon_code_message']
-    shippingaddress = data['shippingaddress']
+
+    customer = request.user
     
-    context = {'items':items, 'order':order, 'cartItems':cartItems, 'shippingaddress':shippingaddress, }
+    shippingaddress = customer.shippingaddress_set.all()
+    print(shippingaddress)
+    
+    user=request.user.id
+    wishlistcount = Wishlist.objects.filter(user=user).count()
+    context = {'items':items, 'order':order, 'cartItems':cartItems, 'shippingaddress':shippingaddress,'wishlistcount':wishlistcount, }
     return render(request, 'store/pages/checkout.html', context)
 
 
@@ -440,10 +468,16 @@ def processOrder(request):
         order.complete = True
         order.status = 'Confirmed'
 
+    for orderItem in order.orderitem_set.all():
+        print(orderItem.product.stock)
+        orderItem.product.stock =   orderItem.product.stock - 1
+        print( orderItem.product.stock)
 
     shippingaddressId = int(data ['orderdata']['shippingaddressId'])
     print(shippingaddressId)
     order.shippingaddress = ShippingAddress.objects.get(id=shippingaddressId)
+
+    order.date_ordered = datetime.datetime.now()
     
     order.save()
 
@@ -482,7 +516,9 @@ def wishlist(request):
     order = data['order']
 
     wishlist = Wishlist.objects.filter(user=request.user)
-    wishlistcount = Wishlist.objects.all().count()
+    user=request.user.id
+    wishlistcount = Wishlist.objects.filter(user=user).count()
+    print(wishlistcount)
 
     context = {'wishlist':wishlist, 'wishlistcount':wishlistcount, 'cartItems':cartItems, 'order':order}
     return render (request, 'store/pages/wishlist.html', context)
@@ -525,6 +561,15 @@ def myOrders(request):
     
     context = {'orders': orders, 'cartItems':cartItems,'order':order,}
     return render(request, 'store/pages/my_orders.html', context)
+
+def cancelOrder(request):
+    if request.method == 'POST':
+        orderId = request.POST.get('orderId')
+        order_to_cancel = Order.objects.get(id=orderId)
+        order_to_cancel.status = 'Cancelled'
+        order_to_cancel.save()
+
+    return JsonResponse({'status': "Order cancelled",'order-status': order_to_cancel.status})
 
         
 def view_invoice(request, order_id):

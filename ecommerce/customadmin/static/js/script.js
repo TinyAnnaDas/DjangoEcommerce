@@ -14,6 +14,7 @@ $(document).ready(function () {
   $('#producttable').DataTable({
       scrollY: 200,
       scrollX: true,
+      "ordering": false
   });
 });
 
@@ -21,6 +22,7 @@ $(document).ready(function () {
   $('#categorytable').DataTable({
       scrollY: 200,
       scrollX: true,
+      "ordering": false
   });
 });
 

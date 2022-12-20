@@ -13,6 +13,7 @@ from django.contrib.auth import get_user_model
 from django.views.decorators.cache import never_cache
 from django.views.decorators.cache import cache_control
 from store.models import *
+from django.db.models import Q
 
 # Create your views here.
 
@@ -71,7 +72,7 @@ def unblockcustomer(request,id):
 
 
 def category(request):
-    CategoryList = Category.objects.all()
+    CategoryList = Category.objects.all().order_by('-id')
     context = {'category': CategoryList}
     return render (request, 'customadmin/category.html', context)
 
@@ -115,8 +116,8 @@ def editcategory(request,id):
 
 
 def products(request):
-    ProductList = Products.objects.all()
-    context = {'products': ProductList}
+    products = Products.objects.order_by('-id')
+    context = {'products': products}
     return render(request, 'customadmin/products.html', context)
 
 def addproduct(request):
@@ -128,11 +129,12 @@ def addproduct(request):
     if request.method == 'POST':
         product_name = request.POST['product_name']
         price = request.POST['price']
+        stock = request.POST['stock']
         category = request.POST['category']
         description = request.POST['description']
         image = request.FILES['image']
      
-        Products.objects.create(name=product_name, price=price,description=description,category_id=category, image=image)
+        Products.objects.create(name=product_name, price=price, stock=stock, description=description,category_id=category, image=image)
    
         print('product added')
         return redirect(products)
@@ -141,13 +143,16 @@ def editproduct(request,id):
     if request.method == 'POST':
         product_name = request.POST['product_name']
         price = request.POST['price']
+        stock = request.POST['stock']
         description = request.POST['description']
         category = request.POST['category']
         offer = request.POST['offerid']
 
+
         product = Products.objects.get(id=id)
         product.name = product_name
         product.price = price
+        product.stock = stock
         product.description = description
         product.category_id=category
         product.offer_id=offer
@@ -176,7 +181,7 @@ def deleteproduct(request, id):
 
 
 def order(request):
-    orders = Order.objects.all().order_by('-id')
+    orders = Order.objects.filter(~Q(status='Pending')).order_by('-id')
     context = {'orders':orders}
     return render(request, 'customadmin/order.html', context)
 
