@@ -15,6 +15,9 @@ from .utils import *
 from xhtml2pdf import pisa
 from django.template.loader import get_template
 from django.core.paginator import Paginator
+from django.db.models import Q
+
+
 
 # Create your views here.
 
@@ -169,11 +172,17 @@ def home(request):
     print(cartItems)
     order = data['order']
 
+    new_4_products = Products.objects.all().order_by('-id')[:4]
+    product_with_offer = Products.objects.filter(~Q(offer_id = None))
+    best_selling_product = OrderItem.objects.all().order_by('id')[:4]
+   
+    
+
     products = Products.objects.all()
 
     user=request.user.id
     wishlistcount = Wishlist.objects.filter(user=user).count()
-    context = {'products':products, 'cartItems':cartItems,'order':order, 'wishlistcount':wishlistcount}
+    context = {'products':products, 'cartItems':cartItems,'order':order, 'wishlistcount':wishlistcount, 'new_4_products':new_4_products, 'product_with_offer':product_with_offer, 'best_selling_product':best_selling_product}
     return render(request, 'store/home.html', context)
 
 

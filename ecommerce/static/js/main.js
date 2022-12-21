@@ -25,10 +25,7 @@
             $('.filter__controls li').removeClass('active');
             $(this).addClass('active');
         });
-        if ($('.product__filter').length > 0) {
-            var containerEl = document.querySelector('.product__filter');
-            var mixer = mixitup(containerEl);
-        }
+     
     });
 
     /*------------------

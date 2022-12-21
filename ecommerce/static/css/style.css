@@ -624,12 +624,12 @@ ol {
 }
 
 .hero__social {
-	margin-top: 190px;
+	margin-top: 100px;
 }
 
 .hero__social a {
 	font-size: 16px;
-	color: #3d3d3d;
+	color: #111111;
 	display: inline-block;
 	margin-right: 32px;
 }
@@ -905,6 +905,7 @@ ol {
 	cursor: pointer;
 }
 
+
 .filter__controls li:last-child {
 	margin-right: 0;
 }
@@ -912,6 +913,26 @@ ol {
 .filter__controls li.active {
 	color: #111111;
 }
+
+.filter__controls button {
+	color: #b7b7b7;
+	font-size: 24px;
+	font-weight: 700;
+	list-style: none;
+	display: inline-block;
+	/* margin-right: 88px; */
+	cursor: pointer;
+}
+
+
+.filter__controls button:last-child {
+	margin-right: 0;
+}
+
+.filter__controls button.active {
+	color: #111111;
+}
+
 
 .product__item {
 	overflow: hidden;
