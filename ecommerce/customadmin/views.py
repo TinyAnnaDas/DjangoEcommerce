@@ -54,7 +54,8 @@ def adminout(request):
 
 def customer(request):
     if 'useradmin' in request.session:
-        UserList = User.objects.all()
+        UserList = User.objects.filter(~Q(first_name='')).order_by('-id')
+        # UserList = User.objects.all()
         context = {'user': UserList}
         return render(request, 'customadmin/customer.html', context)
 
