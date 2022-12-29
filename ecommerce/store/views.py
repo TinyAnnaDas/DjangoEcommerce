@@ -189,7 +189,7 @@ def home(request):
 def categoryView (request, categoryname):
 
     if (Category.objects.filter(category_name=categoryname)):
-        products = Products.objects.filter(category__category_name=categoryname)
+        products = Products.objects.filter(category__category_name=categoryname).order_by('-id')
         product_qty = Products.objects.filter(category__category_name=categoryname).count()
         for product in products:
             if product.offer:
@@ -225,12 +225,6 @@ def store(request):
     print(ordering)
 
     
-
-    # if 'q' in request.GET:
-    #     q=request.GET['q']
-    #     products = Products.objects.filter(name__icontains=q).order_by('-id')
-    #     filter_count = Products.objects.filter(name__icontains=q).order_by('-id').count()
-    # else:
     products = Products.objects.all().order_by('-id')
 
     if ordering:
@@ -252,7 +246,14 @@ def store(request):
     wishlistcount = Wishlist.objects.filter(user=user).count()
    
     
-    context = {'products':products, 'cartItems':cartItems,'order':order, 'categories':categories, 'wishlistcount':wishlistcount}
+    context = {
+        'products':products, 
+        'cartItems':cartItems,
+        'order':order, 
+        'categories':categories, 
+        'wishlistcount':wishlistcount, 
+        
+        }
     return render(request, 'store/store.html', context)
 
 
@@ -281,23 +282,37 @@ def search_results(request):
 
 
 def shop_details(request,id):
-    if request.user.is_authenticated:
-        customer = request.user
-        order, created = Order.objects.get_or_create(user=customer, complete=False)
-        items = order.orderitem_set.all()
-        cartItems = order.get_cart_items
-        cartTotal = order.get_cart_total
-    else:
-        items = []
-        order = {'get_cart_total':0, 'get_cart_items':0}
-        cartItems = order['get_cart_items']
-        cartTotal = order['get_cart_total']
+
+    data = cartData(request)
+    cartItems = data['cartItems']
+    order = data['order']
 
     product = Products.objects.get(id=id)
+
+
     user=request.user.id
     wishlistcount = Wishlist.objects.filter(user=user).count()
-    context = {'product':product,'cartItems':cartItems,'cartTotal':cartTotal,'wishlistcount':wishlistcount}
+    context = {
+        'product':product,
+        'cartItems':cartItems,
+        'order':order,
+        'wishlistcount':wishlistcount
+        }
     return render (request, 'store/pages/shop-details.html', context)
+
+def size_change(request,id):
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        product = Products.objects.get(id=id)
+        print(product)
+        size = request.POST.get('size')
+        price = product.get_product_price_by_size(size)
+        print(price)
+
+        response = {'updated_price':price}
+        return JsonResponse (response)
+
+    return JsonResponse({})
+    
 
 
 def blog(request):

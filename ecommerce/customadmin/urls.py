@@ -18,8 +18,13 @@ urlpatterns = [
 
     path('products/', views.products, name = 'products'),
     path('products/addproduct/',views.addproduct, name = 'addproduct'),
+    path('products/product-attribute/<int:id>/',views.view_product_attribute, name = 'productattribute'),
+    path('products/add-product-attribute/<int:id>/',views.add_product_attribute, name = 'addproductattribute'),
+    path('products/edit-product-attribute/<int:id>/',views.edit_product_attribute, name = 'editproductattribute'),
+
     path('products/editproduct/<int:id>/',views.editproduct, name = 'editproduct'),
     path('products/deleteproduct/<int:id>/',views.deleteproduct, name = 'deleteproduct'),
+    
 
     path('coupons/', views.coupons, name = 'admincoupons'),
     path('coupons/addcoupon/', views.addcoupon, name = 'addcoupon'),

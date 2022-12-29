@@ -34,11 +34,23 @@ class Category(models.Model):
     def __str__(self):
         return self.category_name
 
+class ColorVariant(models.Model):
+    color_name = models.CharField(max_length=100)
+    price = models.DecimalField(max_digits=7, decimal_places=2, null=True, blank=True, default=0)
 
+    def __str__(self):
+        return str(self.color_name)
+
+class SizeVariant(models.Model):
+    size_name = models.CharField(max_length=100)
+    price = models.DecimalField(max_digits=7, decimal_places=2, null=True, blank=True, default=0)
+
+    def __str__(self):
+        return str(self.size_name)
 
 class Products(models.Model):
     name = models.CharField(max_length=200, null=True)
-    price = models.DecimalField(max_digits=7, decimal_places=2)
+    price = models.DecimalField(max_digits=7, decimal_places=2, null=True, blank=True)
     category = models.ForeignKey(Category,on_delete=models.CASCADE)
     quantity = models.IntegerField(null=True, blank=True)
     stock = models.IntegerField(null=True, blank=True)
@@ -51,6 +63,10 @@ class Products(models.Model):
     trending = models.BooleanField(default=False, help_text="0=default, 1=Trending")
     date_created = models.DateTimeField(auto_now_add=True, null=True)
     offer = models.ForeignKey(Offer,on_delete=models.SET_NULL, null=True, blank=True)
+    color_variant = models.ManyToManyField(ColorVariant, blank=True )
+    size_variant = models.ManyToManyField(SizeVariant, blank=True )
+    
+
    
 
 
@@ -63,6 +79,9 @@ class Products(models.Model):
         offerPrice = int(offerPrice_decimal)
         return offerPrice
             
+    def get_product_price_by_size(self, size):
+        return self.price + SizeVariant.objects.get(size_name=size).price
+
            
     
     

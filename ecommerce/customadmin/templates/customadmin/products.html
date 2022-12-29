@@ -39,10 +39,12 @@
                         <td>{{product.price}}</td>
                         <td>{{product.category.category_name}}</td>
                         <td>{{product.stock}}</td>
-                        <td><img class="thumbnail-admin" src="{{product.imageURL}}" alt=""></td>
-                        <td><img class="thumbnail-admin" src="{{product.image1URL}}" alt=""></td>
-                        <td><img class="thumbnail-admin" src="{{product.image2URL}}" alt=""></td>
-                        <td><img class="thumbnail-admin" src="{{product.image3URL}}" alt=""></td>
+                        <td><img class="thumbnail-admin" src="{{product.imageURL}}" alt="{{product.name}}"></td>
+                        <td><img class="thumbnail-admin" src="{{product.image1URL}}" alt="{{product.name}}"></td>
+                        <td><img class="thumbnail-admin" src="{{product.image2URL}}" alt="{{product.name}}"></td>
+                        <td><img class="thumbnail-admin" src="{{product.image3URL}}" alt="{{product.name}}"></td>
+                       
+                        
 
                         {% if product.offer %}
                             <td class="text-success fw-bold">{{product.offer.discount}} %</td>
@@ -62,5 +64,10 @@
         
     </div>
 </div>
+
+
+
+
+
 
 {% endblock content%}

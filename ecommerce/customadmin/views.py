@@ -1,4 +1,4 @@
-from itertools import product
+
 from django.shortcuts import render
 
 # Create your views here.
@@ -118,7 +118,8 @@ def editcategory(request,id):
 
 def products(request):
     products = Products.objects.order_by('-id')
-    context = {'products': products}
+   
+    context = {'products': products,}
     return render(request, 'customadmin/products.html', context)
 
 def addproduct(request):
@@ -136,9 +137,26 @@ def addproduct(request):
         image = request.FILES['image']
      
         Products.objects.create(name=product_name, price=price, stock=stock, description=description,category_id=category, image=image)
+        
    
         print('product added')
         return redirect(products)
+
+def view_product_attribute(request, id):
+
+    product = Products.objects.get(id=id)
+    context = {'product':product}
+    return render(request, 'customadmin/product_attribute.html', context)
+
+def add_product_attribute(request, id):
+    
+    context = {}
+    return render(request, 'customadmin/add_product_attribute.html', context)
+
+
+def edit_product_attribute(request,id):
+    pass
+
 
 def editproduct(request,id):
     if request.method == 'POST':
