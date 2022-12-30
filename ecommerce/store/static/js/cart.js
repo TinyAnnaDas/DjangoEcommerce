@@ -5,45 +5,35 @@ for(var i =0; i < updateBtns.length; i++ ){
     updateBtns[i].addEventListener('click', function(){
         var productId = this.dataset.product
         var action = this.dataset.action
+        
+        var size_variant = this.dataset.size_variant
+        console.log(size_variant)
+        
+
+        // if (size_id == undefined){
+        //     var size_id = 3
+        // }
+
+        if (size_variant == undefined){
+            var size_variant = 'S'
+        }
+        
+        
+        
         console.log('productId:',productId,'action:',action)
 
         // console.log('USER:', user)
             
-        updateUserOrder(productId, action)
+        updateUserOrder(productId, action, size_variant)
         
     })
 }
 
-function addCookieItem(productId, action){
-    console.log('Not logged in...')
-
-    if(action == 'add'){
-        if(cart[productId] == undefined){
-            cart[productId] = {'quantity':1}
-        }else{
-            cart[productId]['quantity'] += 1
-        }
-    }
-
-    if(action == 'remove'){
-        cart[productId]['quantity'] -= 1
-
-        if(cart[productId]['quantity'] <= 0){
-            console.log('Remove Item')
-            delete cart [productId]
-        }
-    }
-
-    
-
-    console.log('Cart:',cart)
-    document.cookie ='cart=' + JSON.stringify(cart) + ";domain=;path=/"
-    location.reload()
-}
 
 
 
-function updateUserOrder(productId, action){
+
+function updateUserOrder(productId, action, size_variant){
     console.log('User is logged in, sending data...')
        
         var csrftoken =  $('input[name=csrfmiddlewaretoken]').val();
@@ -55,13 +45,17 @@ function updateUserOrder(productId, action){
             data: {
                 'productId':productId,
                 'action':action,
+                'size_variant':size_variant,
+              
                 csrfmiddlewaretoken : csrftoken
             },
             success: function (response) {
                
                 console.log(response.itemTotal)
                 console.log(response.itemQty)
+                console.log(size_variant)
                 alertify.success(response.messages);
+                
                 
 
                 let cartqty = document.getElementsByClassName('cartqty')
@@ -82,14 +76,15 @@ function updateUserOrder(productId, action){
 
                 console.log(productId)
                 console.log(action)
-            
+                console.log(size_variant)
+               
                 
 
                 //try and catch because of the problem, when adding items in the store page. 
 
                 try{
 
-                    document.getElementById(productId+'total').innerHTML = '&#8377; ' + response.itemTotal
+                    document.getElementById(productId+'total'+size_variant).innerHTML = '&#8377; ' + response.itemTotal
                     
                 }catch(e){
                     
@@ -98,7 +93,8 @@ function updateUserOrder(productId, action){
 
                 try{
 
-                    document.getElementById(productId+'qty').value = response.itemQty
+                    document.getElementById(productId+'qty'+size_variant).value = response.itemQty
+                    
 
                 }catch(e){
                     

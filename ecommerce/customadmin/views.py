@@ -39,10 +39,11 @@ def adminlogin(request):
 @never_cache
 def dashboard(request):
     if 'useradmin' in request.session:
-        orders = Order.objects.all()
+        orders = Order.objects.filter(complete = True)
         products = Products.objects.all()
+        orders_delivered = Order.objects.filter(status = 'Delivered')
    
-        context = {'orders':orders, 'products':products}
+        context = {'orders':orders, 'products':products, 'orders_delivered':orders_delivered}
         return render(request, 'customadmin/dashboard.html', context)
     return redirect (adminlogin)
 
@@ -63,13 +64,13 @@ def blockcustomer(request,id):
     user=User.objects.get(id=id)
     user.is_active=False
     user.save()
-    return redirect('customadmin/customer')
+    return redirect('customer')
 
 def unblockcustomer(request,id):
     user=User.objects.get(id=id)
     user.is_active=True
     user.save()
-    return redirect('customadmin/customer')
+    return redirect('customer')
 
 
 def category(request):

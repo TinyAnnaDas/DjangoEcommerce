@@ -90,9 +90,13 @@
                             </div>
                          
                             {% if product.offer %}
-                                <h3 id="product_price">&#8377;{{ product.offerPrice|floatformat:2 }} <span class="text-danger">&#8377;product.offerPrice|floatformat:2</span></h3>
+                         
+                            <h3 id="product_price">&#8377; {{ product.offerPrice|floatformat:2 }} </h3>
+                            <h4 class="text-danger" style="text-decoration: line-through;">&#8377; {{product.price|floatformat:2}}</h4>
+
+                              
                             {% else %}
-                                <h3 id="product_price">&#8377;{{ product.price|floatformat:2 }} </h3>
+                                <h3 id="product_price" >&#8377;{{ product.price|floatformat:2 }} </h3>
                             {% endif %}
                      
                             <p>{{product.description}}</p>
@@ -104,10 +108,18 @@
                                     <span>Size:</span>
                                     {% for size in product.size_variant.all %}
                                     {% csrf_token %}
-                                    <label  for="{{size.size_name}}">{{size.size_name}}
-                                        <input  type="radio" onchange="get_correct_price('{{size.size_name}}')" id="{{size.size_name}}">
-                                    </label>
+                                        {%if size.size_name == 'S' %}
+                                        <label class="active"  for="{{size.size_name}}">{{size.size_name}}
+                                            <input type="radio"  onclick="get_correct_price('{{size.size_name}}')" id="{{size.size_name}}">
+                                        </label>
+                                        {% else %}
+                                        <label for="{{size.size_name}}">{{size.size_name}}
+                                            <input type="radio"  onclick="get_correct_price('{{size.size_name}}')" id="{{size.size_name}}">
+                                        </label>
+                                        {% endif %}
+                                   
                                     {% endfor %}
+                                  
                                 </div>
                                 {% endif %}
                                 <div class="product__details__option__color">
@@ -131,7 +143,7 @@
                                     </div>
                                 </div>
                                 {% csrf_token %}
-                                <a data-product = {{product.id}} data-action="add" class="primary-btn update-cart">add to cart</a>
+                                <a data-product = {{product.id}} data-action="add" class="primary-btn update-cart" id="detail-add-to-cart">add to cart</a>
                                 {% endif %}
                             </div>
                             <div class="product__details__btns__option">
@@ -432,7 +444,7 @@
         const csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value
 
         function get_correct_price(size){
-            console.log(size)
+            document.getElementById('detail-add-to-cart').setAttribute("data-size_variant", size)
 
             $.ajax({
                 type: 'POST',
@@ -443,7 +455,7 @@
                 },
                 success: (data) => {
                    
-                    console.log(data.updated_price)
+                    
                     document.getElementById('product_price').innerHTML = '&#8377; ' +  data.updated_price
     
     

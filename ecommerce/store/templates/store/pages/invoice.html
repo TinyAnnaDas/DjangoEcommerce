@@ -92,6 +92,7 @@
                                 <tr>
         							<td><strong>Item</strong></td>
         							<td class="text-center"><strong>Price</strong></td>
+									<td class="text-center"><strong>Size</strong></td>
         							<td class="text-center"><strong>Quantity</strong></td>
         							<td class="text-right"><strong>Totals</strong></td>
                                 </tr>
@@ -101,6 +102,7 @@
     							<tr>
     								<td>{{orderitem.product.name}}</td>
     								<td class="text-center">{{orderitem.product.price}}</td>
+									<td class="text-center">{{orderitem.size_variant}}</td>
     								<td class="text-center">{{orderitem.quantity}}</td>
     								<td class="text-right">{{orderitem.get_total}}</td>
     							</tr>

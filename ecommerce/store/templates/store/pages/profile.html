@@ -3,16 +3,39 @@
 {% load static %}
 
 {% block content %}
+
+
+
 <div class="row" style="padding-top:10rem;">
-    <div class="col-lg-6">
-        <div class="box-element" id="form-wrapper">
-           <h1>My Account</h1>
 
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 p-4">
+                <div class="invoice-title">
+                    <h2>Addresses</h2><h3 class="pull-right"></h3>
+                </div>
+                <hr>
+                <div class="row" style="margin-top:30px;">
+                    {% for i in shippingaddress %}
+                    <div class="col-md-3" >
+                        <address>
+                        <strong> {{i.name}} </strong><br>
+                          Phone : {{i.phone}} <br>
+                            {{i.address}} <br>
+                            {{i.city}} <br>
+                            {{i.state}}, {{i.zipcode}}
+
+                        </address>
+                    </div>
+                    {% endfor %}
+                    
+                </div>
+             
+                
+            </div>
         </div>
-        <br>
-       
-    </div> 
-
+     
+    </div>
   
 </div>
 {% endblock content %}

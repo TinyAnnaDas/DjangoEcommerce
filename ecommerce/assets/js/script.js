@@ -19,6 +19,22 @@ $(document).ready(function () {
 });
 
 $(document).ready(function () {
+  $('#sizetable').DataTable({
+      scrollY: 200,
+      scrollX: true,
+      "ordering": false
+  });
+});
+
+$(document).ready(function () {
+  $('#coupontable').DataTable({
+      scrollY: 200,
+      scrollX: true,
+  });
+});
+
+
+$(document).ready(function () {
   $('#categorytable').DataTable({
       scrollY: 200,
       scrollX: true,

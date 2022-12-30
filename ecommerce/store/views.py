@@ -74,39 +74,55 @@ def signin (request):
             user_open_order, created = Order.objects.get_or_create(complete=False, status='Pending', user_id = request.user.id)
             print(user_open_order)
           
-          
-            
-
             guest_open_order = Order.objects.get(complete=False, status='Pending', user_id = guest_customer.id)
             print(guest_open_order)
 
-            user_orderItems = OrderItem.objects.filter(order_id = user_open_order.id)
-            print(user_orderItems)
 
             guest_orderItems = OrderItem.objects.filter(order_id = guest_open_order.id)
             print(guest_orderItems)
 
-            for g_orderitem in guest_orderItems:
-                print(g_orderitem.product.name)
-                print(g_orderitem.product)
-                print(g_orderitem.quantity)
+            user_orderItems = OrderItem.objects.filter(order_id = user_open_order.id)
+            print(user_orderItems)
 
-                for u_orderitem in user_orderItems:
-                    if user_orderItems.filter(product=g_orderitem.product):
-                    # if guestuser's orderitem's product is present in current user's orderitems
-                    # then check if the user orderitem (inner loop) is equal to the guest useritem (outerloop)
-                        if u_orderitem.product == g_orderitem.product:
-                            u_orderitem.quantity = u_orderitem.quantity + g_orderitem.quantity
-                            u_orderitem.save()
-                        
-                    else:
-                        # create a new order item with product from the guest user. 
-                        product = g_orderitem.product
-                        new_orderitem = OrderItem.objects.create(order = user_open_order, product = product)
-        
-                        new_orderitem.quantity = new_orderitem.quantity + g_orderitem.quantity
-                        new_orderitem.save()
-                        
+            if user_orderItems.exists():
+
+                for g_orderitem in guest_orderItems:
+                    print(g_orderitem.product.name)
+                    print(g_orderitem.quantity)
+
+                    for u_orderitem in user_orderItems:
+                        if user_orderItems.filter(product=g_orderitem.product):
+                        # if guestuser's orderitem's product is present in current user's orderitems
+                        # then check if the user orderitem (inner loop) is equal to the guest useritem (outerloop)
+                            if u_orderitem.product == g_orderitem.product: 
+                                if u_orderitem.size_variant == g_orderitem.size_variant:
+                                    u_orderitem.quantity = u_orderitem.quantity + g_orderitem.quantity
+                                    u_orderitem.save()
+                                else:
+                                    product = g_orderitem.product
+                                    size_variant = g_orderitem.size_variant
+                                    new_orderitem = OrderItem.objects.create(order = user_open_order, product = product, size_variant = size_variant)
+            
+                                    new_orderitem.quantity = new_orderitem.quantity + g_orderitem.quantity
+                                    new_orderitem.save()
+                            
+                            
+                        else:
+                            # create a new order item with product from the guest user. 
+                            product = g_orderitem.product
+                            size_variant = g_orderitem.size_variant
+                            new_orderitem = OrderItem.objects.create(order = user_open_order, product = product, size_variant = size_variant)
+            
+                            new_orderitem.quantity = new_orderitem.quantity + g_orderitem.quantity
+                            new_orderitem.save()
+            else:
+
+                for g_orderitem in guest_orderItems:
+                    product = g_orderitem.product
+                    size_variant = g_orderitem.size_variant
+                    new_orderitem = OrderItem.objects.create(order = user_open_order, product = product, size_variant=size_variant)
+                    new_orderitem.quantity = g_orderitem.quantity
+                    new_orderitem.save()
 
             guest_customer.delete()
             guest_open_order.delete()
@@ -174,7 +190,7 @@ def home(request):
 
     new_4_products = Products.objects.all().order_by('-id')[:4]
     product_with_offer = Products.objects.filter(~Q(offer_id = None))
-    best_selling_product = OrderItem.objects.all().order_by('id')[:4]
+    best_selling_product = OrderItem.objects.all().distinct("product_id")[:4]
    
     
 
@@ -209,7 +225,11 @@ def categoryView (request, categoryname):
 
 
 def profile(request):
-    return render(request, 'store/pages/profile.html')
+    user = request.user
+    shippingaddress = user.shippingaddress_set.all()
+   
+    context = {'shippingaddress':shippingaddress}
+    return render(request, 'store/pages/profile.html',context)
 
 
 # def wishlist(request):
@@ -222,17 +242,20 @@ def coupons(request):
 def store(request):
 
     ordering = request.GET.get('ordering', "")
-    print(ordering)
+    price = request.GET.get('price', "")
 
     
     products = Products.objects.all().order_by('-id')
 
     if ordering:
         products = products.order_by(ordering)
+    if price:
+        print(int(price)-100)
+        products = products.filter(price__gte = price, price__lt = int(price)+100)
 
-    #pagination
-    paginator = Paginator(products, 12)
+    #pagination 
     page_num = request.GET.get('page', 1)
+    paginator = Paginator(products, 12)
     products = paginator.page(page_num)
 
 
@@ -244,6 +267,8 @@ def store(request):
 
     user=request.user.id
     wishlistcount = Wishlist.objects.filter(user=user).count()
+    size_variant = SizeVariant.objects.all()
+    color_variant = ColorVariant.objects.all().order_by('id')
    
     
     context = {
@@ -252,6 +277,8 @@ def store(request):
         'order':order, 
         'categories':categories, 
         'wishlistcount':wishlistcount, 
+        'size_variant':size_variant,
+        'color_variant':color_variant,
         
         }
     return render(request, 'store/store.html', context)
@@ -338,6 +365,7 @@ def cart(request):
     items = data['items']
 
     
+    
     user=request.user.id
     wishlistcount = Wishlist.objects.filter(user=user).count()
 
@@ -369,6 +397,11 @@ def updateItem(request):
     if request.method == 'POST':
         productId = request.POST.get('productId')
         action = request.POST.get('action')
+        size_variant = request.POST.get('size_variant')
+        size_id = request.POST.get('size_id')
+        print('tiny')
+        print(size_id)
+        print(size_variant)
         print('Action:',action)
         print('productId:',productId)
 
@@ -380,11 +413,14 @@ def updateItem(request):
             customer, created = User.objects.get_or_create(device=device)
             print(customer.device)
 
+        
         product = Products.objects.get(id=productId)
         print(product)
         order, created = Order.objects.get_or_create(user=customer,complete = False, status='Pending')
+        size_variant = SizeVariant.objects.get(size_name = size_variant)
+        orderItem, created = OrderItem.objects.get_or_create(order=order, product=product, size_variant=size_variant)
 
-        orderItem, created = OrderItem.objects.get_or_create(order=order, product=product)
+        
 
         if action == 'add':
             orderItem.quantity = (orderItem.quantity + 1)
@@ -396,11 +432,13 @@ def updateItem(request):
                 messages = 'Item removed from cart'
   
         orderItem.save()
-        print(orderItem.order_id)
 
         if action == 'delete':
             orderItem.delete()
+            print('tiny')
             messages = 'Product removed from cart'
+
+        
 
         
         print(orderItem.product.name)
@@ -507,26 +545,6 @@ def processOrder(request):
 
     print(order)
 
-    
-   
-
-   
-
-
-    # except:
-    #     shippingaddressId = data ['shipping']['shippingaddressId'],
-    #     shppingaddress = ShippingAddress.objects.get(id=shippingaddressId)
-    #     print(shppingaddress.address)
-    #     ShippingAddress.objects.create(
-    #         user = customer,
-    #         order = order,
-    #         address = shppingaddress.address,
-           
-    #         city = shppingaddress.city,
-    #         state = shppingaddress.state,
-    #         zipcode = shppingaddress.state,
-
-    #     )
 
    
 
@@ -602,18 +620,12 @@ def view_invoice(request, order_id):
     print(current_order)
     
     orderitems = OrderItem.objects.filter(order_id = current_order.id)
-    print(orderitems)
-    # order_item=[]
-    # for order in current_order:
-
-        # for orderitem in order:
-        #     print(order.orderitem_set.last().product.name)
 
     user = request.user
-    print(user)
+    
     template_path = 'store/pages/invoice.html'
    
-    print(template_path)
+   
 
     context = {'current_order': current_order, 'orderitems':orderitems, 'user': user}
 

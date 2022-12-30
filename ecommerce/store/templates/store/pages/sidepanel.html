@@ -40,13 +40,13 @@
                     <div id="collapseThree" class="collapse show" data-parent="#accordionExample">
                         <div class="card-body">
                             <div class="shop__sidebar__price">
-                                <ul>
-                                    <li><a href="#">$0.00 - $50.00</a></li>
-                                    <li><a href="#">$50.00 - $100.00</a></li>
-                                    <li><a href="#">$100.00 - $150.00</a></li>
-                                    <li><a href="#">$150.00 - $200.00</a></li>
-                                    <li><a href="#">$200.00 - $250.00</a></li>
-                                    <li><a href="#">250.00+</a></li>
+                                <ul id = "filter-list">
+                                    <li><a value="200">&#8377; 200.00 - &#8377; 299.00</a></li>
+                                    <li><a value="300">&#8377; 300.00 - &#8377; 399.00</a></li>
+                                    <li><a value="400">&#8377; 400.00 - &#8377; 499.00</a></li>
+                                    <li><a value="500">&#8377; 500.00 - &#8377; 599.00</a></li>
+                                    <li><a value="600">&#8377; 600.00 - &#8377; 699.00</a></li>
+                                    <li><a value="700">&#8377; 700 +</a></li>
                                 </ul>
                             </div>
                         </div>
@@ -59,8 +59,8 @@
                     <div id="collapseFour" class="collapse show" data-parent="#accordionExample">
                         <div class="card-body">
                             <div class="shop__sidebar__size">
-                                {% for size in sizes %}
-                                <label for="sm">{{size.size__title}}
+                                {% for size_variant in size_variant %}
+                                <label for="sm">{{size_variant.size_name}}
                                     <input value="{{size.size__id}}" type="radio" id="sm">
                                 </label>
                                 {% endfor %}
@@ -76,9 +76,9 @@
                     <div id="collapseFive" class="collapse show" data-parent="#accordionExample">
                         <div class="card-body">
                             <div class="shop__sidebar__color">
-                                {% for color in colors %}
-                                <label class="c-1" for="sp-1" style="background:{{color.color__color_code}}">
-                                    <input value="{{color.color__id}}" type="radio" id="sp-1">
+                                {% for color_variant in color_variant %}
+                                <label class="c-1" for="sp-1" style="background:{{color_variant.color_code}}">
+                                    <input value="" type="radio" id="sp-1">
                                 </label>
                                 {% endfor %}
                             </div>
@@ -175,4 +175,36 @@
             sidelinks[i].classList.add = "shop__sidebar__brand_active"
         }
     }
+
+
+
+    //............Filter using price..............
+
+    // IE does not know about the target attribute. It looks for srcElement
+    // This function will get the event target in a browser-compatible way
+
+    function getEventTarget(e) {
+        e = e || window.event;
+        return e.target || e.srcElement; 
+    }
+
+
+
+    var filter_list = document.getElementById('filter-list');
+
+    filter_list.onclick = function(event) {
+        var target = getEventTarget(event);
+        console.log(target.getAttribute("value"))
+       
+        var url = new URL(window.location.href) 
+        var search_params = url.searchParams; 
+        search_params.set('price', target.getAttribute("value"))
+        url.search = search_params.toString()
+        console.log(url.search)
+        location = url
+        
+    };
+
+
+
 </script>

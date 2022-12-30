@@ -33,9 +33,7 @@
                     <div class="shop__product__option">
                         <div class="row">
                             <div class="col-lg-6 col-md-6 col-sm-6">
-                                <!-- <div class="shop__product__option__left">
-                                    <p>Showing 1–12 of 126 results</p>
-                                </div> -->
+                           
                             </div>
                             <div class="col-lg-6 col-md-6 col-sm-6">
                                 <div class="shop__product__option__right">
@@ -44,8 +42,8 @@
                                         <option value="" id="placeholder" disabled selected hidden>Sort products</option>
                                         <option id="price" value="price">Low To High</option>
                                         <option id="-price" value="-price">High To Low</option>
-                                        <option id="product_name" value="product_name">Product Name </option>
-                                        <option id="-date-added" value="-date-added">What's new?</option>
+                                        <option id="name" value="name">Product Name </option>
+                                        <option id="-date_created" value="-date_created">What's new?</option>
                                     </select>
                                 </div>
                             </div>
@@ -87,8 +85,8 @@
 
                                         {% if product.offer  %}
                                         <div class="row ">
-                                            <h5 class="text-danger col-md-5" style="text-decoration: line-through;"> &#8377; {{ product.offerPrice|floatformat:2}} </h5>
-                                            <h5 class="text-success "> &#8377; </h5>
+                                            <h5 class="text-danger col-md-5" style="text-decoration: line-through;"> &#8377; {{ product.price|floatformat:2}} </h5>
+                                            <h5 class="text-success "> &#8377; {{product.offerPrice|floatformat:2}} </h5>
                                         </div>
                                         {% else %}
                                         <h5> &#8377; {{ product.price|floatformat:2 }}</h5>
@@ -97,11 +95,6 @@
                                         {% if  product.stock < 10 and product.stock != 0  %}
                                         <h6 class="text-danger"> Only {{product.stock}} remaining</h6>
                                         {% endif %}
-                                        
-                                       
-
-                                   
-
                                 </div>
                             </div>
                         </div>
@@ -118,8 +111,7 @@
                                         <a class="" href="?page={{i}}">{{i}}</a>
                                     {% endif %}
                                 {% endfor %}
-                                <!-- <span>...</span> 
-                                <a href="#">21</a> -->
+                             
                             </div>
                         </div>
                     </div>
@@ -130,30 +122,6 @@
     </section>
 
    
-
-<!-- Shop Section End -->
-
-
-
-
-    <!-- <div class="row ">
-        {% for product in products %}
-        <div class="col-lg-3 col-6 box-element product">
-            <img class="img-fluid thumbnail " src="{{product.imageURL}}" alt="">
-            <div class="box-element product">
-                <h6><strong>{{product.name}}</strong></h6>
-                <hr>
-                <button data-product="{{product.id}}" data-action="add" class="btn btn-outline-secondary add-btn update-cart">Add to Cart</button>
-                <a class="btn btn-outline-success " href="#">view</a>
-                <h5 style=" float:right">
-                    &#8377; {{product.price|floatformat:2}}</h5>
-            </div>
-            
-        </div>
-        {%endfor%}
-    
-
-    </div> -->
 
     <script>
 
@@ -167,9 +135,6 @@
         if(get('ordering'))
         document.getElementById('placeholder').innerHTML = "Sort: " + document.getElementById(get('ordering')).innerHTML;
 
-        if(get('price'))
-        document.getElementById('price-placeholder').innerHTML = "Price: " + document.getElementById('pr'+get('price')).innerHTML;
-        
         // for getting url after applying ordering
         function finalurl(){
             var url = new URL(window.location.href) //taking the current URL 

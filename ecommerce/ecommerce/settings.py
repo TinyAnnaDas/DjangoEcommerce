@@ -127,18 +127,18 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+STATIC_ROOT = os.path.join(BASE_DIR, 'assets/')
 
 STATICFILES_DIRS = [
 
-    os.path.join(BASE_DIR,'ecommerce/static'),
+    os.path.join(BASE_DIR,'store/static'),
     os.path.join(BASE_DIR,'customadmin/static'),
 ]
 
 
 MEDIA_URL = 'images/'
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'static/images/media')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'assets/images/media')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field

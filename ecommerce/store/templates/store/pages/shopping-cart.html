@@ -35,6 +35,7 @@
                                     <tr>
                                         <th>Product</th>
                                         <th>Quantity</th>
+                                        <th>Size</th>
                                         <th>Total</th>
                                         <th></th>
                                     </tr>
@@ -50,21 +51,22 @@
                                                 </div>
                                                 <div class="product__cart__item__text">
                                                     <h6>{{item.product.name}}</h6>
-                                                    <h5>&#8377; {{item.product.price}}</h5>
+                                                    <h5>&#8377; {{item.updated_price_by_size}}</h5>
                                                 </div>
                                             </td>
                                             <td class="quantity__item">
                                                 <div class="quantity">
                                                     <div class="pro-qty-2" >
                                                         {% csrf_token %}
-                                                        <span class="fa fa-angle-left qtybutton update-cart" id="dec-button" data-product = {{item.product.id}} data-action="remove"></span>
-                                                        <input type="text" id="{{item.product.id}}qty" value="{{item.quantity}}">
-                                                        <span class="fa fa-angle-right inc qtybutton update-cart" data-product = {{item.product.id}} data-action="add"></span>
+                                                        <span class="fa fa-angle-left qtybutton update-cart" id="dec-button"  data-product = {{item.product.id}} data-action="remove" data-size_variant="{{item.size_variant.size_name}}"></span>
+                                                        <input type="text" id="{{item.product.id}}qty{{item.size_variant.size_name}}" value="{{item.quantity}}">
+                                                        <span class="fa fa-angle-right inc qtybutton update-cart" data-product = {{item.product.id}} data-action="add" data-size_variant="{{item.size_variant.size_name}}"></span>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td class="cart__price " id="{{item.product.id}}total" >&#8377; {{item.get_total|floatformat:2}}</td>
-                                            <td class="cart__close "><i data-product = {{item.product.id}} data-action="delete" class="fa fa-close update-cart"></i></td>
+                                            <td class="cart__sizevariant " >{{item.size_variant}}</td>
+                                            <td class="cart__price " id="{{item.product.id}}total{{item.size_variant.size_name}}" >&#8377; {{item.get_total|floatformat:2}}</td>
+                                            <td class="cart__close "><i data-product = {{item.product.id}} data-action="delete" class="fa fa-close update-cart" data-size_variant="{{item.size_variant.size_name}}"></i></td>
                                         </tr>
                                 
                                     {% endfor %}

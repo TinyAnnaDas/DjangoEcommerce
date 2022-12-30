@@ -35,7 +35,8 @@ class Category(models.Model):
         return self.category_name
 
 class ColorVariant(models.Model):
-    color_name = models.CharField(max_length=100)
+    color_name = models.CharField(max_length=100, default='Black')
+    color_code = models.CharField(max_length=50, null=True, blank=True)
     price = models.DecimalField(max_digits=7, decimal_places=2, null=True, blank=True, default=0)
 
     def __str__(self):
@@ -80,8 +81,12 @@ class Products(models.Model):
         return offerPrice
             
     def get_product_price_by_size(self, size):
-        return self.price + SizeVariant.objects.get(size_name=size).price
+        if self.offer:
+            return self.offerPrice + SizeVariant.objects.get(size_name=size).price
+        else:
+            return self.price + SizeVariant.objects.get(size_name=size).price
 
+    
            
     
     
@@ -185,17 +190,43 @@ class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True)
     quantity = models.IntegerField(default=0,null=True, blank=True)
     date_added = models.DateTimeField(auto_now_add=True)
+    color_variant = models.ForeignKey(ColorVariant, on_delete=models.SET_NULL, null=True, blank=True)
+    size_variant = models.ForeignKey(SizeVariant, on_delete=models.SET_NULL, null=True, blank=True)
+
+    @property
+    def updated_price_by_size(self):
+        if self.product.offer:
+            return self.product.offerPrice + SizeVariant.objects.get(size_name=self.size_variant).price
+        else:
+            return self.product.price + SizeVariant.objects.get(size_name=self.size_variant).price
 
     @property
     def get_total(self):
+
+        if self.product.offer and self.size_variant:
+            price = [self.product.offerPrice]
+            size_variant_price = self.size_variant.price
+            price.append(size_variant_price)
+            variant_price = sum(price)
+            total = variant_price * self.quantity
+            return total
+
         if self.product.offer:
             total = self.product.offerPrice * self.quantity
-            
+            return total
+                
+        if  self.size_variant:
+            price = [self.product.price]
+            size_variant_price = self.size_variant.price
+            price.append(size_variant_price)
+            variant_price = sum(price) 
+            total = variant_price * self.quantity
             return total
         else:
-            print(self.product.price)
             total = self.product.price * self.quantity
             return total
+
+  
     
 
 class Coupons(models.Model):

@@ -1292,7 +1292,41 @@ ol {
 	cursor: pointer;
 }
 
+.shop__sidebar__color label.c-1 {
+	background: #0b090c;
+}
 
+.shop__sidebar__color label.c-2 {
+	background: #20315f;
+}
+
+.shop__sidebar__color label.c-3 {
+	background: #f1af4d;
+}
+
+.shop__sidebar__color label.c-4 {
+	background: #636068;
+}
+
+.shop__sidebar__color label.c-5 {
+	background: #57594d;
+}
+
+.shop__sidebar__color label.c-6 {
+	background: #e8bac4;
+}
+
+.shop__sidebar__color label.c-7 {
+	background: #d6c1d7;
+}
+
+.shop__sidebar__color label.c-8 {
+	background: #ed1c24;
+}
+
+.shop__sidebar__color label.c-9 {
+	background: #ffffff;
+}
 
 .shop__sidebar__color label:after {
 	position: absolute;
@@ -1584,12 +1618,17 @@ ol {
 }
 
 .product__details__text h3 span {
-	color: #b7b7b7;
 	font-size: 20px;
 	font-weight: 400;
 	margin-left: 10px;
 	text-decoration: line-through;
 }
+
+.product__details__text h3 {
+	display: inline !important;
+}
+
+
 
 .product__details__text p {
 	margin-bottom: 35px;
@@ -1663,7 +1702,21 @@ ol {
 	background: #0b090c;
 }
 
+.product__details__option__color label.c-2 {
+	background: #20315f;
+}
 
+.product__details__option__color label.c-3 {
+	background: #f1af4d;
+}
+
+.product__details__option__color label.c-4 {
+	background: #ed1c24;
+}
+
+.product__details__option__color label.c-9 {
+	background: #ffffff;
+}
 
 .product__details__option__color label:after {
 	position: absolute;
@@ -2312,6 +2365,13 @@ ol {
 	width: 10px;
 	cursor: pointer;
 }
+
+.shopping__cart__table table tbody tr td.cart__sizevariant {
+	color: #111111;
+	font-size: 18px;
+	width: 100px;
+}
+
 
 .shopping__cart__table table tbody tr td.cart__price {
 	color: #111111;
